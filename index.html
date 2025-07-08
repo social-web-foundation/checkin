@@ -118,14 +118,14 @@
       async function handleResults(params) {
         const savedState = sessionStorage.getItem('oauth_state')
         sessionStorage.removeItem('oauth_state')
-        if (params['state'] !== savedState) {
+        if (params.get('state') !== savedState) {
           console.error('Bad state')
         }
-        if (params['error']) {
-          console.error(params['error'])
+        if (params.get('error')) {
+          console.error(params.get('error'))
         }
-        if (params['code']) {
-          const code = params['code']
+        if (params.get('code')) {
+          const code = params.get('code')
           const url = sessionStorage.getItem('oauth_token_url')
           sessionStorage.removeItem('oauth_token_url')
           const code_verifier = sessionStorage.getItem('oauth_pkce_verifier')
@@ -156,7 +156,7 @@
         main.innerHTML = '';
         if (window.location.search) {
           const params = new URLSearchParams(window.location.search)
-          if (params['state']) {
+          if (params.get('state')) {
             handleResults(params)
             // redirect to base
             window.location = redirect_uri
