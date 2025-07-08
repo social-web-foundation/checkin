@@ -6,6 +6,7 @@
   "id": "https://checkin.swf.pub/client.jsonld",
   "name": "Checkin Sample App",
   "summary": "A sample client for geosocial activities over ActivityPub",
+  "redirectURI": "https://checkin.swf.pub/",
   "attributedTo": {
     "id": "https://socialwebfoundation.org/author/evanprodromou/",
     "name": "Evan Prodromou"
