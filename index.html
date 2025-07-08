@@ -30,6 +30,8 @@
   <body>
     <div class="main"></div>
     <script type="module">
+      const client_id = 'https://checkin.swf.pub/client.jsonld'
+      const redirect_uri = 'https://checkin.swf.pub/'
       async function getActorId(id) {
         const re = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/;
         const m = re.exec(id)
@@ -70,6 +72,10 @@
         return actor.endpoints?.oauthAuthorizationEndpoint
       }
 
+      async function getTokenEndpoint(actor) {
+        return actor.endpoints?.oauthTokenEndpoint
+      }
+
       function generateCodeVerifier(length = 64) {
         const array = new Uint8Array(length);
         crypto.getRandomValues(array);
@@ -99,8 +105,8 @@
         const challenge = await generateCodeChallenge(verifier)
         const params = new URLSearchParams({
           response_type: 'code',
-          client_id: 'https://checkin.swf.pub/client.jsonld',
-          redirect_uri: 'https://checkin.swf.pub/',
+          client_id,
+          redirect_uri,
           scope: 'read write',
           state,
           code_challenge: challenge,
@@ -109,10 +115,53 @@
         window.location = `${authorizationUrl}?${params}`
       }
 
+      async function handleResults(params) {
+        const savedState = sessionStorage.getItem('oauth_state')
+        sessionStorage.removeItem('oauth_state')
+        if (params['state'] !== savedState) {
+          console.error('Bad state')
+        }
+        if (params['error']) {
+          console.error(params['error'])
+        }
+        if (params['code']) {
+          const code = params['code']
+          const url = sessionStorage.getItem('oauth_token_url')
+          sessionStorage.removeItem('oauth_token_url')
+          const code_verifier = sessionStorage.getItem('oauth_pkce_verifier')
+          sessionStorage.removeItem('oauth_pkce_verifier')
+          const tp = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code,
+            client_id,
+            redirect_uri,
+            code_verifier
+          })
+          const res = fetch($url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: tp})
+          if (!res.ok) {
+            console.error('Error')
+          } else {
+            const json = await res.json()
+            localStorage.setItem('access_token', json.access_token)
+            localStorage.setItem('refresh_token', json.refresh_token)
+            localStorage.setItem('expires_in', json.expires_in)
+          }
+        }
+      }
       document.addEventListener('DOMContentLoaded', function() {
         const main = document.querySelector('.main');
         main.innerHTML = '';
-        if (localStorage.getItem('access_token')) {
+        if (window.location.search) {
+          const params = new URLSearchParams(window.location.search)
+          if (params['state']) {
+            handleResults(params)
+            // redirect to base
+            window.location = redirect_uri
+          }
+        } else if (localStorage.getItem('access_token')) {
           main.innerHTML = `
             <sl-alert open variant="primary">Hello, World!</sl-alert>
           `;
@@ -144,7 +193,10 @@
             }
             try {
               const actorId = await getActorId(id)
+              sessionStorage.setItem('oauth_actor_id', actorId)
               const actor = await getActor(actorId)
+              const tokenUrl = await getTokenEndpoint(actor)
+              sessionStorage.setItem('oauth_token_url', tokenUrl)
               const authorizationUrl = await getAuthorizationEndpoint(actor)
               await loginWith(authorizationUrl)
             } catch (error) {
