@@ -1,0 +1,13 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://purl.archive.org/socialweb/oauth"
+  ],
+  "id": "https://checkin.swf.pub/client.jsonld",
+  "name": "Checkin Sample App",
+  "summary": "A sample client for geosocial activities over ActivityPub",
+  "attributedTo": {
+    "id": "https://socialwebfoundation.org/author/evanprodromou/",
+    "name": "Evan Prodromou"
+  }
+}
