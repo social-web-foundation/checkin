@@ -137,7 +137,7 @@
             redirect_uri,
             code_verifier
           })
-          const res = fetch(url, {
+          const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: tp})
