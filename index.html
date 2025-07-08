@@ -145,9 +145,9 @@
             console.error('Error')
           } else {
             const json = await res.json()
-            localStorage.setItem('access_token', json.access_token)
-            localStorage.setItem('refresh_token', json.refresh_token)
-            localStorage.setItem('expires_in', json.expires_in)
+            sessionStorage.setItem('access_token', json.access_token)
+            sessionStorage.setItem('refresh_token', json.refresh_token)
+            sessionStorage.setItem('expires_in', json.expires_in)
           }
         }
       }
@@ -161,7 +161,7 @@
             // redirect to base
             window.location = redirect_uri
           }
-        } else if (localStorage.getItem('access_token')) {
+        } else if (sessionStorage.getItem('access_token')) {
           main.innerHTML = `
             <sl-alert open variant="primary">Hello, World!</sl-alert>
           `;
