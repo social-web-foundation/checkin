@@ -162,9 +162,24 @@
             window.location = redirect_uri
           }
         } else if (sessionStorage.getItem('access_token')) {
-          main.innerHTML = `
-            <sl-alert open variant="primary">Hello, World!</sl-alert>
-          `;
+            main.innerHTML = `
+            <nav style="display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1em 2em; border-radius: 10px 10px 0 0;">
+              <span style="font-weight: 700; font-size: 1.3em; letter-spacing: 0.01em; color: #222;">Checkin</span>
+              <sl-button id="logout-btn" variant="danger" size="small">Logout</sl-button>
+            </nav>
+            <div style="background: #fff; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 2em; border-radius: 0 0 12px 12px; min-height: 20vh;">
+              <sl-alert open variant="primary">You are logged in!</sl-alert>
+            </div>
+            `;
+            // Logout handler
+            document.getElementById('logout-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('access_token');
+            sessionStorage.removeItem('refresh_token');
+            sessionStorage.removeItem('expires_in');
+            sessionStorage.removeItem('oauth_actor_id');
+            window.location = redirect_uri;
+            });
+          ;
         } else {
           main.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center;">
