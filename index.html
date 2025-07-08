@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js"></script>
+  </head>
+  <body>
+    <div class="main"></div>
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', function() {
+        const main = document.querySelector('.main');
+        main.innerHTML = '';
+        if (localStorage.getItem('access_token')) {
+          main.innerHTML = `
+            <sl-alert open variant="primary">Hello, World!</sl-alert>
+          `;
+        } else {
+          main.innerHTML = `
+            <sl-input id="webfinger" label="Webfinger ID" placeholder="user@example.com"></sl-input>
+            <sl-button id="login-btn" variant="primary" style="margin-top: 1em;">Login</sl-button>
+          `;
+        }
+      });
+    </script>
+  </body>
+</html>
