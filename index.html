@@ -3,6 +3,29 @@
   <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js"></script>
+    <style>
+      .login-container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: center;
+        width: 60ch;
+        margin: 20vh auto 0 auto;
+        gap: 1em;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+        padding: 2em 2em 1.5em 2em;
+        border-radius: 12px;
+      }
+      body {
+        min-height: 100vh;
+        background: #f6f8fa;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    </style>
   </head>
   <body>
     <div class="main"></div>
@@ -16,8 +39,13 @@
           `;
         } else {
           main.innerHTML = `
-            <sl-input id="webfinger" label="Webfinger ID" placeholder="user@example.com"></sl-input>
-            <sl-button id="login-btn" variant="primary" style="margin-top: 1em;">Login</sl-button>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <h1 style="margin-bottom: 1.5em; font-size: 2.2em; font-weight: 700; color: #222; letter-spacing: 0.02em;">Checkin</h1>
+              <div class="login-container">
+                <sl-input id="webfinger" label="Webfinger ID" placeholder="user@example.com" style="flex:1;"></sl-input>
+                <sl-button id="login-btn" variant="primary">Login</sl-button>
+              </div>
+            </div>
           `;
         }
       });
