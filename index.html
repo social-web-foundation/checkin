@@ -151,13 +151,13 @@
           }
         }
       }
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', async function() {
         const main = document.querySelector('.main');
         main.innerHTML = '';
         if (window.location.search) {
           const params = new URLSearchParams(window.location.search)
           if (params.get('state')) {
-            handleResults(params)
+            await handleResults(params)
             // redirect to base
             window.location = redirect_uri
           }
