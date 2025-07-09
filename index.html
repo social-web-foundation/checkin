@@ -118,6 +118,7 @@
 
       async function apFetch(url, options = {}) {
         await ensureFreshToken();
+        const accessToken = sessionStorage.getItem("access_token");
         const actorId = sessionStorage.getItem("actor_id");
         if (URL.parse(url).origin == URL.parse(actorId).origin) {
           if (!options.headers) {
