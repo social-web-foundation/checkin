@@ -1,83 +1,71 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js"></script>
-    <style>
-      .login-container {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-end;
-        justify-content: center;
-        width: 60ch;
-        margin: 20vh auto 0 auto;
-        gap: 1em;
-        background: #fff;
-        box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-        padding: 2em 2em 1.5em 2em;
-        border-radius: 12px;
-      }
-      body {
-        min-height: 100vh;
-        background: #f6f8fa;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js"
+    ></script>
+    <link rel="stylesheet" href="checkin.css" />
   </head>
   <body>
     <div class="main"></div>
     <script type="module">
-      const client_id = 'https://checkin.swf.pub/client.jsonld'
-      const redirect_uri = 'https://checkin.swf.pub/'
+      const client_id = "https://checkin.swf.pub/client.jsonld";
+      const redirect_uri = "https://checkin.swf.pub/";
       async function getActorId(id) {
-        const re = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/;
-        const m = re.exec(id)
+        const re =
+          /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/;
+        const m = re.exec(id);
         if (!m) {
-          throw new Error('bad Webfinger format')
+          throw new Error("bad Webfinger format");
         }
-        const username = m.groups.username
-        const domain = m.groups.domain
-        const wfUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}%40${domain}`
-        const res = await fetch(wfUrl)
+        const username = m.groups.username;
+        const domain = m.groups.domain;
+        const wfUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}%40${domain}`;
+        const res = await fetch(wfUrl);
         if (!res.ok) {
-          throw new Error('Could not load webfinger')
+          throw new Error("Could not load webfinger");
         }
-        const json = await res.json()
+        const json = await res.json();
         if (!json.links) {
-          throw new Error('No links in webfinger json')
+          throw new Error("No links in webfinger json");
         }
-        const actorLink = json.links.find((obj) =>
-          obj.rel == 'self' &&
-          ['application/activity+json',
-           'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'].includes(obj.type)
-        )
+        const actorLink = json.links.find(
+          (obj) =>
+            obj.rel == "self" &&
+            [
+              "application/activity+json",
+              'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+            ].includes(obj.type)
+        );
         if (!actorLink) {
-          throw new Error('No ActivityPub actor ID in Webfinger')
+          throw new Error("No ActivityPub actor ID in Webfinger");
         }
-        return actorLink.href
+        return actorLink.href;
       }
 
       async function getActor(actorId) {
-        const res = await fetch(actorId)
+        const res = await fetch(actorId);
         if (!res.ok) {
-          throw new Error('Failure fetching actor')
+          throw new Error("Failure fetching actor");
         }
-        return await res.json()
+        return await res.json();
       }
 
       async function getAuthorizationEndpoint(actor) {
-        return actor.endpoints?.oauthAuthorizationEndpoint
+        return actor.endpoints?.oauthAuthorizationEndpoint;
       }
 
       async function getTokenEndpoint(actor) {
-        return actor.endpoints?.oauthTokenEndpoint
+        return actor.endpoints?.oauthTokenEndpoint;
       }
 
       async function getProxyUrl(actor) {
-        return actor.endpoints?.proxyUrl
+        return actor.endpoints?.proxyUrl;
       }
 
       function generateCodeVerifier(length = 64) {
@@ -89,159 +77,159 @@
       async function generateCodeChallenge(verifier) {
         const encoder = new TextEncoder();
         const data = encoder.encode(verifier);
-        const digest = await crypto.subtle.digest('SHA-256', data);
+        const digest = await crypto.subtle.digest("SHA-256", data);
         return base64UrlEncode(new Uint8Array(digest));
       }
 
       async function ensureFreshToken() {
-        const expires = sessionStorage.getItem('expires')
+        const expires = sessionStorage.getItem("expires");
         if (Date.now() > expires) {
-          const url = sessionStorage.getItem('oauth_token_url')
-          const refresh_token = sessionStorage.getItem('refresh_token')
+          const url = sessionStorage.getItem("oauth_token_url");
+          const refresh_token = sessionStorage.getItem("refresh_token");
           const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-              grant_type: 'refresh_token',
+              grant_type: "refresh_token",
               refresh_token,
-              client_id
-            })
-          })
+              client_id,
+            }),
+          });
           if (!res.ok) {
-            console.error('Error')
+            console.error("Error");
           } else {
-            const json = await res.json()
+            const json = await res.json();
             if (json.access_token) {
-              sessionStorage.setItem('access_token', json.access_token)
+              sessionStorage.setItem("access_token", json.access_token);
             }
             if (json.refresh_token) {
-              sessionStorage.setItem('refresh_token', json.refresh_token)
+              sessionStorage.setItem("refresh_token", json.refresh_token);
             }
             if (json.expires_in) {
-              sessionStorage.setItem('expires_in', json.expires_in)
-              sessionStorage.setItem('expires', Date.now() + json.expires_in * 1000)
+              sessionStorage.setItem("expires_in", json.expires_in);
+              sessionStorage.setItem(
+                "expires",
+                Date.now() + json.expires_in * 1000
+              );
             }
           }
         }
       }
 
       async function apFetch(url, options = {}) {
-        await ensureFreshToken()
-        const actorId = sessionStorage.getItem('actor_id')
+        await ensureFreshToken();
+        const actorId = sessionStorage.getItem("actor_id");
         if (URL.parse(url).origin == URL.parse(actorId).origin) {
           if (!options.headers) {
-            options.headers = {}
+            options.headers = {};
           }
-          options.headers['Authorization'] = `Bearer ${accessToken}`
-          return await fetch(url, options)
+          options.headers["Authorization"] = `Bearer ${accessToken}`;
+          return await fetch(url, options);
         } else {
-          const proxyUrl = sessionStorage.getItem('proxy_url')
-          return await fetch(proxyUrl,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          const proxyUrl = sessionStorage.getItem("proxy_url");
+          return await fetch(proxyUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-              'id': url
-            })
-          })
+              id: url,
+            }),
+          });
         }
       }
 
       function base64UrlEncode(buffer) {
         const b64 = btoa(String.fromCharCode(...buffer));
-        return b64
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/, '');
+        return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
       }
 
       async function loginWith(authorizationUrl) {
-        const state = crypto.randomUUID()
-        sessionStorage.setItem('oauth_state', state)
-        const verifier = generateCodeVerifier()
-        sessionStorage.setItem('oauth_pkce_verifier', verifier)
-        const challenge = await generateCodeChallenge(verifier)
+        const state = crypto.randomUUID();
+        sessionStorage.setItem("oauth_state", state);
+        const verifier = generateCodeVerifier();
+        sessionStorage.setItem("oauth_pkce_verifier", verifier);
+        const challenge = await generateCodeChallenge(verifier);
         const params = new URLSearchParams({
-          response_type: 'code',
+          response_type: "code",
           client_id,
           redirect_uri,
-          scope: 'read write',
+          scope: "read write",
           state,
           code_challenge: challenge,
-          code_challenge_method:'S256',
-        })
-        window.location = `${authorizationUrl}?${params}`
+          code_challenge_method: "S256",
+        });
+        window.location = `${authorizationUrl}?${params}`;
       }
 
       async function handleResults(params) {
-        const savedState = sessionStorage.getItem('oauth_state')
-        sessionStorage.removeItem('oauth_state')
-        if (params.get('state') !== savedState) {
-          console.error('Bad state')
+        const savedState = sessionStorage.getItem("oauth_state");
+        sessionStorage.removeItem("oauth_state");
+        if (params.get("state") !== savedState) {
+          console.error("Bad state");
         }
-        if (params.get('error')) {
-          console.error(params.get('error'))
+        if (params.get("error")) {
+          console.error(params.get("error"));
         }
-        if (params.get('code')) {
-          const code = params.get('code')
-          const url = sessionStorage.getItem('oauth_token_url')
-          const code_verifier = sessionStorage.getItem('oauth_pkce_verifier')
-          sessionStorage.removeItem('oauth_pkce_verifier')
+        if (params.get("code")) {
+          const code = params.get("code");
+          const url = sessionStorage.getItem("oauth_token_url");
+          const code_verifier = sessionStorage.getItem("oauth_pkce_verifier");
+          sessionStorage.removeItem("oauth_pkce_verifier");
           const tp = new URLSearchParams({
-            grant_type: 'authorization_code',
+            grant_type: "authorization_code",
             code,
             client_id,
             redirect_uri,
-            code_verifier
-          })
+            code_verifier,
+          });
           const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: tp})
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: tp,
+          });
           if (!res.ok) {
-            console.error('Error')
+            console.error("Error");
           } else {
-            const json = await res.json()
-            sessionStorage.setItem('access_token', json.access_token)
-            sessionStorage.setItem('refresh_token', json.refresh_token)
-            sessionStorage.setItem('expires_in', json.expires_in)
-            sessionStorage.setItem('expires', Date.now() + json.expires_in * 1000)
+            const json = await res.json();
+            sessionStorage.setItem("access_token", json.access_token);
+            sessionStorage.setItem("refresh_token", json.refresh_token);
+            sessionStorage.setItem("expires_in", json.expires_in);
+            sessionStorage.setItem(
+              "expires",
+              Date.now() + json.expires_in * 1000
+            );
+            window.location = redirect_uri;
           }
         }
       }
-      document.addEventListener('DOMContentLoaded', async function() {
-        const main = document.querySelector('.main');
-        main.innerHTML = '';
-        if (window.location.search) {
-          const params = new URLSearchParams(window.location.search)
-          if (params.get('state')) {
-            await handleResults(params)
-            // redirect to base
-            window.location = redirect_uri
-          }
-        } else if (sessionStorage.getItem('access_token')) {
-          const actorId = sessionStorage.getItem('actor_id')
-          const actor = await apFetch(actorId)
-            main.innerHTML = `
-            <nav style="display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1em 2em; border-radius: 10px 10px 0 0;">
-              <span style="font-weight: 700; font-size: 1.3em; letter-spacing: 0.01em; color: #222;">Checkin</span>
-              <sl-button id="logout-btn" variant="danger" size="small">Logout</sl-button>
-            </nav>
-            <div style="background: #fff; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 2em; border-radius: 0 0 12px 12px; min-height: 20vh;">
-              <sl-alert open variant="primary">${actor.name}, you are logged in!</sl-alert>
-            </div>
-            `;
-            // Logout handler
-            document.getElementById('logout-btn').addEventListener('click', () => {
-            sessionStorage.removeItem('access_token');
-            sessionStorage.removeItem('refresh_token');
-            sessionStorage.removeItem('expires_in');
-            sessionStorage.removeItem('actor_id');
-            window.location = redirect_uri;
-            });
-          ;
-        } else {
-          main.innerHTML = `
+
+      async function mainLayout() {
+        const main = document.querySelector(".main");
+        const actorId = sessionStorage.getItem("actor_id");
+        const actor = await apFetch(actorId);
+        main.innerHTML = `
+        <nav class="navbar">
+          <span class="app-title">Checkin</span>
+          <sl-button id="logout-btn" variant="danger" size="small">Logout</sl-button>
+        </nav>
+        <div class="welcome">
+          <sl-alert open variant="primary">
+            ${actor.name}, you are logged in!
+          </sl-alert>
+        </div>
+        `;
+        // Logout handler
+        document.getElementById("logout-btn").addEventListener("click", () => {
+          sessionStorage.removeItem("access_token");
+          sessionStorage.removeItem("refresh_token");
+          sessionStorage.removeItem("expires_in");
+          sessionStorage.removeItem("actor_id");
+          window.location = redirect_uri;
+        });
+      }
+
+      async function loginLayout() {
+        const main = document.querySelector(".main");
+        main.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center;">
               <h1 style="margin-bottom: 1.5em; font-size: 2.2em; font-weight: 700; color: #222; letter-spacing: 0.02em;">Checkin</h1>
               <div id="error-container" style="width: 100%; max-width: 60ch; margin-bottom: 1em;"></div>
@@ -251,35 +239,45 @@
               </div>
             </div>
           `;
-          // Add click handler for login button
-          const loginBtn = document.getElementById('login-btn');
-          const webfingerInput = document.getElementById('webfinger');
-          const errorContainer = document.getElementById('error-container');
-          // Helper to show error
-          function showError(message) {
-            errorContainer.innerHTML = `<sl-alert open variant="danger">${message}</sl-alert>`;
+        // Add click handler for login button
+        const loginBtn = document.getElementById("login-btn");
+        const webfingerInput = document.getElementById("webfinger");
+        const errorContainer = document.getElementById("error-container");
+        // Helper to show error
+        function showError(message) {
+          errorContainer.innerHTML = `<sl-alert open variant="danger">${message}</sl-alert>`;
+        }
+        loginBtn.addEventListener("click", async () => {
+          errorContainer.innerHTML = "";
+          const id = webfingerInput.value.trim();
+          if (!id) {
+            showError("Please enter your Webfinger ID.");
+            return;
           }
-          loginBtn.addEventListener('click', async () => {
-            errorContainer.innerHTML = '';
-            const id = webfingerInput.value.trim();
-            if (!id) {
-              showError('Please enter your Webfinger ID.');
-              return;
-            }
-            try {
-              const actorId = await getActorId(id)
-              sessionStorage.setItem('actor_id', actorId)
-              const actor = await getActor(actorId)
-              const tokenUrl = await getTokenEndpoint(actor)
-              sessionStorage.setItem('oauth_token_url', tokenUrl)
-              const proxyUrl = await getProxyUrl(actor)
-              sessionStorage.setItem('proxy_url', proxyUrl)
-              const authorizationUrl = await getAuthorizationEndpoint(actor)
-              await loginWith(authorizationUrl)
-            } catch (error) {
-              showError(error.message)
-            }
-          });
+          try {
+            const actorId = await getActorId(id);
+            sessionStorage.setItem("actor_id", actorId);
+            const actor = await getActor(actorId);
+            const tokenUrl = await getTokenEndpoint(actor);
+            sessionStorage.setItem("oauth_token_url", tokenUrl);
+            const proxyUrl = await getProxyUrl(actor);
+            sessionStorage.setItem("proxy_url", proxyUrl);
+            const authorizationUrl = await getAuthorizationEndpoint(actor);
+            await loginWith(authorizationUrl);
+          } catch (error) {
+            showError(error.message);
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("state")) {
+          await handleResults(params);
+        } else if (sessionStorage.getItem("access_token")) {
+          await mainLayout();
+        } else {
+          await loginLayout();
         }
       });
     </script>
