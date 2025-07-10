@@ -1,5 +1,7 @@
 import { html, css, LitElement, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
 
+import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.2.3/+esm';
+
 export class CheckinActivityElement extends LitElement {
 
   static styles = css`
@@ -25,7 +27,7 @@ export class CheckinActivityElement extends LitElement {
       <p>
       ${
         (this.activity.summary)
-        ? unsafeHTML`${this.activity.summary}`
+        ? unsafeHTML(DOMPurify(this.activity.summary))
         : this.makeSummary()
       }
       </p>
