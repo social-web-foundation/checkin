@@ -165,7 +165,10 @@ export class CheckinInboxElement extends LitElement {
       const proxyUrl = sessionStorage.getItem("proxy_url");
       return await fetch(proxyUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": `Bearer ${accessToken}`
+        },
         body: new URLSearchParams({
           id: url,
         }),
