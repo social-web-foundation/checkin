@@ -15,7 +15,8 @@ export class CheckinInboxElement extends CheckinElement {
 
   static get properties() {
     return {
-      ...super.properties(),
+      redirectUri: { type: String, attribute: "redirect-uri" },
+      clientId: { type: String, attribute: "client-id" },
       _error: { type: String, state: true },
       _activities: { type: Array, state: true }
     };
