@@ -225,7 +225,7 @@
         const minLon = lon - deltaLon;
         const maxLon = lon + deltaLon;
 
-        return [minLat, minLon, maxLat, maxLon];
+        return [minLon, minLat, maxLon, maxLat];
       }
 
       async function mainLayout() {
@@ -261,10 +261,10 @@
                 sessionStorage.setItem("longitude", longitude);
 
                 try {
-                  const [minLatitude, minLongitude, maxLatitude, maxLongitude] = bbox(latitude, longitude, 100)
+                  const [minLongitude, minLatitude, maxLongitude, maxLatitude] = bbox(latitude, longitude, 1000)
 
                   const res = await fetch(
-                    `https://places.pub/search?bbox=${minLatitude},${minLongitude},${maxLatitude},${maxLongitude}`
+                    `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
                   );
 
                   if (!res.ok) {
