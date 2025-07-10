@@ -229,14 +229,14 @@
       }
 
       async function doActivity(obj) {
-        let inbox = sessionStorage.getItem("inbox");
-        if (!inbox) {
+        let outbox = sessionStorage.getItem("outbox");
+        if (!outbox) {
           const res = await apFetch(sessionStorage.getItem("actor_id"));
           const actor = await res.json();
-          inbox = actor.inbox;
-          sessionStorage.setItem("inbox", inbox);
+          outbox = actor.outbox;
+          sessionStorage.setItem("outbox", outbox);
         }
-        await apFetch(inbox, {
+        await apFetch(outbox, {
           method: "POST",
           headers: {
             "Content-Type": "application/activity+json"
