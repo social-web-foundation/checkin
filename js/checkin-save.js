@@ -67,7 +67,7 @@ class CheckinSaveElement extends LitElement {
           "expires",
           Date.now() + json.expires_in * 1000
         );
-
+        window.location = this.redirectUri
       }
     }
   }
