@@ -150,7 +150,7 @@ class CheckinMainElement extends LitElement {
     sessionStorage.removeItem("refresh_token");
     sessionStorage.removeItem("expires_in");
     sessionStorage.removeItem("actor_id");
-    window.location = redirect_uri;
+    window.location = this.redirectUri
   }
 
   async ensureFreshToken() {
@@ -164,7 +164,7 @@ class CheckinMainElement extends LitElement {
         body: new URLSearchParams({
           grant_type: "refresh_token",
           refresh_token,
-          client_id,
+          client_id: this.clientId
         }),
       });
       if (!res.ok) {

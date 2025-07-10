@@ -26,7 +26,7 @@
           (params.get("state"))
           ? `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`
           : (sessionStorage.getItem("access_token"))
-            ? "<checkin-main />"
+            ? `<checkin-main  client-id=${client_id} redirect-uri=${redirect_uri} />`
             : `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri}  />`;
       });
     </script>
