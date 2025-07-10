@@ -57,7 +57,7 @@ export class CheckinInboxElement extends LitElement {
 
     for await (const activity of this.items(inbox)) {
       if (this.isGeo(activity)) {
-        activities.append(activity)
+        activities.push(activity)
       }
       if (activities.length >= this.MAX_ACTIVITIES) {
         break;
