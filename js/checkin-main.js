@@ -5,11 +5,6 @@ import {
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
 class CheckinMainElement extends LitElement {
-  static styles = css`
-    :host {
-      display: block;
-    }
-  `;
 
   static get properties() {
     return {
