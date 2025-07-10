@@ -82,7 +82,7 @@
       }
 
       async function ensureFreshToken() {
-        const expires = sessionStorage.getItem("expires");
+        const expires = parseInt(sessionStorage.getItem("expires"))
         if (Date.now() > expires) {
           const url = sessionStorage.getItem("oauth_token_url");
           const refresh_token = sessionStorage.getItem("refresh_token");
@@ -206,7 +206,8 @@
       async function mainLayout() {
         const main = document.querySelector(".main");
         const actorId = sessionStorage.getItem("actor_id");
-        const actor = await apFetch(actorId);
+        const res = await apFetch(actorId);
+        const actor = (res.ok) ? await res.json() : null;
         main.innerHTML = `
         <nav class="navbar">
           <span class="app-title">Checkin</span>
@@ -214,7 +215,7 @@
         </nav>
         <div class="welcome">
           <sl-alert open variant="primary">
-            ${actor.name}, you are logged in!
+            ${actor?.name}, you are logged in!
           </sl-alert>
         </div>
         `;
