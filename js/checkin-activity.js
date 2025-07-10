@@ -33,9 +33,9 @@ export class CheckinActivityElement extends CheckinElement {
       <p>
       ${
         (this.activity.summary)
-        ? unsafeHTML(DOMPurify(this.activity.summary))
+        ? unsafeHTML(DOMPurify.sanitize(this.activity.summary))
           : (this.activity.summaryMap?.en)
-            ? unsafeHTML(DOMPurify(this.activity.summaryMap?.en))
+            ? unsafeHTML(DOMPurify.sanitize(this.activity.summaryMap?.en))
             : this.makeSummary()
       }
       </p>
