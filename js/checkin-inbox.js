@@ -4,7 +4,7 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
-import { CheckinActivityElement } from 'checkin-activity.js'
+import { CheckinActivityElement } from './checkin-activity.js'
 
 export class CheckinInboxElement extends LitElement {
 
