@@ -137,7 +137,7 @@ class CheckinMainElement extends LitElement {
       type: "Arrive",
       location: placeId,
       summaryMap: {
-        en: `${this.actor.name} arrived at ${placeName}`,
+        en: `${actor.name} arrived at ${placeName}`,
       },
       to: "https://www.w3.org/ns/activitystreams#Public",
     });
