@@ -4,12 +4,13 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
-export class CheckinMainElement extends LitElement {
+import { CheckinElement } from './checkin-element.js'
+
+export class CheckinMainElement extends CheckinElement {
 
   static get properties() {
     return {
-      redirectUri: { type: String, attribute: "redirect-uri" },
-      clientId: { type: String, attribute: "client-id" },
+      ...super.properties(),
       _error: { type: String, state: true },
       _lat: { type: Number, state: true },
       _lon: { type: Number, state: true },

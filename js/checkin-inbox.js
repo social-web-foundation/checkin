@@ -4,17 +4,18 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
+
+import { CheckinElement } from './checkin-element.js'
 import { CheckinActivityElement } from './checkin-activity.js'
 
-export class CheckinInboxElement extends LitElement {
+export class CheckinInboxElement extends CheckinElement {
 
   MAX_ACTIVITIES = 20
   MAX_TIME_WINDOW = 3 * 24 * 60 * 60 * 1000 // three days
 
   static get properties() {
     return {
-      redirectUri: { type: String, attribute: "redirect-uri" },
-      clientId: { type: String, attribute: "client-id" },
+      ...super.properties(),
       _error: { type: String, state: true },
       _activities: { type: Array, state: true }
     };

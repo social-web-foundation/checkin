@@ -4,6 +4,8 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
+import { CheckinElement } from './checkin-element.js'
+
 export class CheckinLoginElement extends LitElement {
 
   static get properties() {
