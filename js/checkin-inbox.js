@@ -47,10 +47,10 @@ export class CheckinInboxElement extends LitElement {
 
   async getActivities() {
     let inbox = sessionStorage.getItem("inbox");
-    if (!outbox) {
+    if (!inbox) {
       const actor = await this.getActor();
-      outbox = actor.outbox;
-      sessionStorage.setItem("inbox", outbox);
+      inbox = actor.inbox;
+      sessionStorage.setItem("inbox", inbox);
     }
 
     const activities = []
