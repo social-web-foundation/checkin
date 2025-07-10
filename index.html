@@ -308,7 +308,8 @@
                       const placeId = btn.dataset.placeId;
                       await doActivity({
                         type: "Arrive",
-                        location: placeId
+                        location: placeId,
+                        to: "as:Public"
                       })
                     });
                   });
