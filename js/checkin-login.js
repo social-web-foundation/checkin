@@ -49,7 +49,7 @@ class CheckinLoginElement extends LitElement {
             style="flex:1;"
           ></sl-input>
           <sl-button
-            @click=${this.login()}
+            @click=${this._login}
             id="login-btn"
             variant="primary">
             Login
@@ -129,7 +129,7 @@ class CheckinLoginElement extends LitElement {
     return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
-  async login() {
+  async _login() {
     const id = webfingerInput.value.trim();
     if (!id) {
       this._error = "Please enter your Webfinger ID.";
