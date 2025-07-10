@@ -119,7 +119,7 @@ class CheckinMainElement extends LitElement {
                         data-place-id="${place.id}"
                         data-place-name="${place.name}"
                         size="small"
-                        @click=${this._checkin}
+                        @click=${this._checkin.bind(this)}
                         >Checkin</sl-button
                       >
                     </li>`
@@ -135,7 +135,7 @@ class CheckinMainElement extends LitElement {
     const btn = e.currentTarget;
     const placeId = btn.dataset.placeId;
     const placeName = btn.dataset.placeName;
-    await doActivity({
+    await this.doActivity({
       type: "Arrive",
       location: placeId,
       summaryMap: {
