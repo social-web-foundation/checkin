@@ -4,7 +4,7 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
-class CheckinMainElement extends LitElement {
+export class CheckinMainElement extends LitElement {
 
   static get properties() {
     return {
@@ -141,6 +141,10 @@ class CheckinMainElement extends LitElement {
       },
       to: "https://www.w3.org/ns/activitystreams#Public",
     });
+    const next = document.createElement('checkin-inbox');
+    next.setAttribute('redirect-uri', this.redirectUri)
+    next.setAttribute('client-id', this.cliendId)
+    this.replaceWith(next)
   }
 
   _logout() {

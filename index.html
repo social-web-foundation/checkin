@@ -13,6 +13,7 @@
     <script type="module" src="js/checkin-login.js"></script>
     <script type="module" src="js/checkin-main.js"></script>
     <script type="module" src="js/checkin-save.js"></script>
+    <script type="module" src="js/checkin-inbox.js"></script>
   </head>
   <body>
     <div id="main"></div>
@@ -26,7 +27,7 @@
           (params.get("state"))
           ? `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`
           : (sessionStorage.getItem("access_token"))
-            ? `<checkin-main  client-id=${client_id} redirect-uri=${redirect_uri} />`
+            ? `<checkin-main client-id=${client_id} redirect-uri=${redirect_uri} />`
             : `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri}  />`;
       });
     </script>

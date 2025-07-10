@@ -4,7 +4,7 @@ import {
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
-class CheckinLoginElement extends LitElement {
+export class CheckinLoginElement extends LitElement {
 
   static get properties() {
     return {
