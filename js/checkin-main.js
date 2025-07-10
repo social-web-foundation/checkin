@@ -30,7 +30,7 @@ class CheckinMainElement extends LitElement {
       this._lat = latitude;
       this._lon = longitude;
 
-      const [minLongitude, minLatitude, maxLongitude, maxLatitude] = bbox(
+      const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
         latitude,
         longitude,
         100
