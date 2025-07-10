@@ -261,7 +261,7 @@
                 sessionStorage.setItem("longitude", longitude);
 
                 try {
-                  const [minLongitude, minLatitude, maxLongitude, maxLatitude] = bbox(latitude, longitude, 1000)
+                  const [minLongitude, minLatitude, maxLongitude, maxLatitude] = bbox(latitude, longitude, 100)
 
                   const res = await fetch(
                     `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
