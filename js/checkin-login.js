@@ -130,6 +130,7 @@ class CheckinLoginElement extends LitElement {
   }
 
   async _login() {
+    const webfingerInput = this.shadowRoot.querySelector('#webfinger')
     const id = webfingerInput.value.trim();
     if (!id) {
       this._error = "Please enter your Webfinger ID.";
