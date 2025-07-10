@@ -70,8 +70,8 @@ export class CheckinInboxElement extends LitElement {
     this._activities = activities
   }
 
-  async *items(collection) {
-    const collection = await this.toObject(collection)
+  async *items(coll) {
+    const collection = await this.toObject(coll)
     if (collection.items) {
       for (const item in collection.items) {
         yield await this.toObject(item)
