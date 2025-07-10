@@ -73,11 +73,11 @@ export class CheckinInboxElement extends LitElement {
   async *items(coll) {
     const collection = await this.toObject(coll)
     if (collection.items) {
-      for (const item in collection.items) {
+      for (const item of collection.items) {
         yield await this.toObject(item)
       }
     } else if (collection.orderedItems) {
-      for (const item in collection.orderedItems) {
+      for (const item of collection.orderedItems) {
         yield await this.toObject(item)
       }
     } else if (collection.first) {
@@ -85,11 +85,11 @@ export class CheckinInboxElement extends LitElement {
       do {
         const page = await this.toObject(pageId)
         if (page.items) {
-          for (const item in collection.items) {
+          for (const item of collection.items) {
             yield await this.toObject(item)
           }
         } else if (page.orderedItems) {
-          for (const item in collection.orderedItems) {
+          for (const item of collection.orderedItems) {
             yield await this.toObject(item)
           }
         }
