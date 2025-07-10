@@ -298,7 +298,7 @@
                 <ul>
             ${places.items.filter((p) => p.name).map(
                 (place) =>
-                  `<li>${place.name} <sl-button class="checkin-button" data-place-id="${place.id}" size="small">Checkin</sl-button></li>`
+                  `<li>${place.name} <sl-button class="checkin-button" data-place-id="${place.id}" data-place-name="${place.name}" size="small">Checkin</sl-button></li>`
               )
               .join("")}
                 </ul>
@@ -306,10 +306,14 @@
                   document.querySelectorAll('.checkin-button').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                       const placeId = btn.dataset.placeId;
+                      const placeName = btn.dataset.placeName;
                       await doActivity({
                         type: "Arrive",
                         location: placeId,
-                        to: "as:Public"
+                        summaryMap: {
+                          en:  `${actor.name} arrived at ${placeName}`
+                        },
+                        to: "https://www.w3.org/ns/activitystreams#Public"
                       })
                     });
                   });
