@@ -25,8 +25,6 @@ class CheckinMainElement extends LitElement {
     super.connectedCallback();
     navigator.geolocation.getCurrentPosition(async (position) => {
       const { latitude, longitude } = position.coords;
-      sessionStorage.setItem("latitude", latitude);
-      sessionStorage.setItem("longitude", longitude);
       this._lat = latitude;
       this._lon = longitude;
 
@@ -77,8 +75,7 @@ class CheckinMainElement extends LitElement {
   async doActivity(obj) {
     let outbox = sessionStorage.getItem("outbox");
     if (!outbox) {
-      const res = await apFetch(sessionStorage.getItem("actor_id"));
-      const actor = await res.json();
+      const actor = await this.getActor();
       outbox = actor.outbox;
       sessionStorage.setItem("outbox", outbox);
     }
@@ -135,11 +132,12 @@ class CheckinMainElement extends LitElement {
     const btn = e.currentTarget;
     const placeId = btn.dataset.placeId;
     const placeName = btn.dataset.placeName;
+    const actor = await this.getActor()
     await this.doActivity({
       type: "Arrive",
       location: placeId,
       summaryMap: {
-        en: `${actor.name} arrived at ${placeName}`,
+        en: `${this.actor.name} arrived at ${placeName}`,
       },
       to: "https://www.w3.org/ns/activitystreams#Public",
     });
@@ -208,6 +206,15 @@ class CheckinMainElement extends LitElement {
         }),
       });
     }
+  }
+
+  async getActor() {
+    const actorId = sessionStorage.getItem("actor_id")
+    const res = await this.apFetch(actorId);
+    if (!res.ok) {
+      throw new Error("Failure fetching actor");
+    }
+    return await res.json();
   }
 }
 
