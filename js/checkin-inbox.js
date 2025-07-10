@@ -37,7 +37,7 @@ export class CheckinInboxElement extends LitElement {
     <sl-button @click=${this._startCheckin.bind(this)}>Checkin</sl-button>
     <div class="inbox-activities">
     ${this._activities.map(a =>
-      html`<checkin-activity activity=${a}></checkin-activity>`
+      html`<checkin-activity .activity=${a}></checkin-activity>`
       )
     }
     </div>
