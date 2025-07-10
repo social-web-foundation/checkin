@@ -247,7 +247,7 @@
           .getElementById("get-location-btn")
           .addEventListener("click", async () => {
             const placesList = document.getElementById("places-list");
-            placesList.innerHTML = "";
+            placesList.innerHTML = "<sl-spinner style='font-size: 2rem;'></sl-spinner>";
 
             if (!navigator.geolocation) {
               placesList.innerHTML = `<sl-alert open variant="danger">Geolocation is not supported by your browser.</sl-alert>`;
@@ -272,11 +272,11 @@
                   }
                   const places = await res.json();
                   if (places.items.length === 0) {
-                    placesList.innerHTML = `<sl-alert open variant="warning">No nearby places found within 1 km.</sl-alert>`;
+                    placesList.innerHTML = `<sl-alert open variant="warning">No nearby places found within 100m.</sl-alert>`;
                   } else {
                     placesList.innerHTML = `
                 <ul>
-            ${places.items.map(
+            ${places.items.filter((p) => p.name).map(
                 (place) =>
                   `<li>${place.name}</li>`
               )
