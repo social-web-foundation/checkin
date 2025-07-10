@@ -239,13 +239,13 @@
         await apFetch(outbox, {
           method: "POST",
           headers: {
-            "Content-Type": "application/activity+json"
+            "Content-Type": "application/activity+json",
           },
           body: JSON.stringify({
             "@context": "https://www.w3.org/ns/activitystreams",
-            ...obj
-          })
-        })
+            ...obj,
+          }),
+        });
       }
 
       async function mainLayout() {
@@ -267,7 +267,8 @@
           .getElementById("get-location-btn")
           .addEventListener("click", async () => {
             const placesList = document.getElementById("places-list");
-            placesList.innerHTML = "<sl-spinner style='font-size: 2rem;'></sl-spinner>";
+            placesList.innerHTML =
+              "<sl-spinner style='font-size: 2rem;'></sl-spinner>";
 
             if (!navigator.geolocation) {
               placesList.innerHTML = `<sl-alert open variant="danger">Geolocation is not supported by your browser.</sl-alert>`;
@@ -281,7 +282,8 @@
                 sessionStorage.setItem("longitude", longitude);
 
                 try {
-                  const [minLongitude, minLatitude, maxLongitude, maxLatitude] = bbox(latitude, longitude, 100)
+                  const [minLongitude, minLatitude, maxLongitude, maxLatitude] =
+                    bbox(latitude, longitude, 100);
 
                   const res = await fetch(
                     `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
@@ -296,27 +298,31 @@
                   } else {
                     placesList.innerHTML = `
                 <ul>
-            ${places.items.filter((p) => p.name).map(
+            ${places.items
+              .filter((p) => p.name)
+              .map(
                 (place) =>
                   `<li>${place.name} <sl-button class="checkin-button" data-place-id="${place.id}" data-place-name="${place.name}" size="small">Checkin</sl-button></li>`
               )
               .join("")}
                 </ul>
               `;
-                  document.querySelectorAll('.checkin-button').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                      const placeId = btn.dataset.placeId;
-                      const placeName = btn.dataset.placeName;
-                      await doActivity({
-                        type: "Arrive",
-                        location: placeId,
-                        summaryMap: {
-                          en:  `${actor.name} arrived at ${placeName}`
-                        },
-                        to: "https://www.w3.org/ns/activitystreams#Public"
-                      })
-                    });
-                  });
+                    document
+                      .querySelectorAll(".checkin-button")
+                      .forEach((btn) => {
+                        btn.addEventListener("click", async (e) => {
+                          const placeId = btn.dataset.placeId;
+                          const placeName = btn.dataset.placeName;
+                          await doActivity({
+                            type: "Arrive",
+                            location: placeId,
+                            summaryMap: {
+                              en: `${actor.name} arrived at ${placeName}`,
+                            },
+                            to: "https://www.w3.org/ns/activitystreams#Public",
+                          });
+                        });
+                      });
                   }
                 } catch (error) {
                   placesList.innerHTML = `<sl-alert open variant="danger">${error.message}</sl-alert>`;
