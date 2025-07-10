@@ -264,7 +264,7 @@
                   const [minLatitude, minLongitude, maxLatitude, maxLongitude] = bbox(latitude, longitude, 100)
 
                   const res = await fetch(
-                    `https://places.pub/search?&bbox=${minLatitude},${minLongitude},${maxLatitude},${maxLongitude})`
+                    `https://places.pub/search?bbox=${minLatitude},${minLongitude},${maxLatitude},${maxLongitude})`
                   );
 
                   if (!res.ok) {
