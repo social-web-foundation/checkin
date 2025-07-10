@@ -126,7 +126,7 @@ class CheckinMainElement extends LitElement {
                 )}
               </ul>
             </div>`
-          : `<sl-spinner style='font-size: 2rem;'></sl-spinner>`}
+          : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`}
       </div>
     `;
   }
