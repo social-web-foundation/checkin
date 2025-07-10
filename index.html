@@ -228,6 +228,26 @@
         return [minLon, minLat, maxLon, maxLat];
       }
 
+      async function doActivity(obj) {
+        let inbox = sessionStorage.getItem("inbox");
+        if (!inbox) {
+          const res = await apFetch(sessionStorage.getItem("actor_id"));
+          const actor = await res.json();
+          inbox = actor.inbox;
+          sessionStorage.setItem("inbox", inbox);
+        }
+        await apFetch(inbox, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/activity+json"
+          },
+          body: JSON.stringify({
+            "@context": "https://www.w3.org/ns/activitystreams",
+            ...obj
+          })
+        })
+      }
+
       async function mainLayout() {
         const main = document.querySelector(".main");
         const actorId = sessionStorage.getItem("actor_id");
@@ -278,11 +298,20 @@
                 <ul>
             ${places.items.filter((p) => p.name).map(
                 (place) =>
-                  `<li>${place.name}</li>`
+                  `<li>${place.name} <sl-button class="checkin-button" data-place-id="${place.id}" size="small">Checkin</sl-button></li>`
               )
               .join("")}
                 </ul>
               `;
+                  document.querySelectorAll('.checkin-button').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                      const placeId = btn.dataset.placeId;
+                      await doActivity({
+                        type: "Arrive",
+                        location: placeId
+                      })
+                    });
+                  });
                   }
                 } catch (error) {
                   placesList.innerHTML = `<sl-alert open variant="danger">${error.message}</sl-alert>`;
