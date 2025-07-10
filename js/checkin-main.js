@@ -45,7 +45,7 @@ class CheckinMainElement extends LitElement {
       }
 
       const collection = await res.json();
-      this.places = collection.items;
+      this._places = collection.items;
     });
   }
 
