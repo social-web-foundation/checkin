@@ -79,7 +79,7 @@ class CheckinMainElement extends LitElement {
       outbox = actor.outbox;
       sessionStorage.setItem("outbox", outbox);
     }
-    await apFetch(outbox, {
+    await this.apFetch(outbox, {
       method: "POST",
       headers: {
         "Content-Type": "application/activity+json",
@@ -187,7 +187,7 @@ class CheckinMainElement extends LitElement {
   }
 
   async apFetch(url, options = {}) {
-    await ensureFreshToken();
+    await this.ensureFreshToken();
     const accessToken = sessionStorage.getItem("access_token");
     const actorId = sessionStorage.getItem("actor_id");
     if (URL.parse(url).origin == URL.parse(actorId).origin) {
