@@ -151,8 +151,8 @@ class CheckinLoginElement extends LitElement {
       const challenge = await this.generateCodeChallenge(verifier);
       const params = new URLSearchParams({
         response_type: "code",
-        client_id,
-        redirect_uri,
+        client_id: this.clientId,
+        redirect_uri: this.redirectUri,
         scope: "read write",
         state,
         code_challenge: challenge,
