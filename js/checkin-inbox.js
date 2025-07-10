@@ -72,7 +72,7 @@ export class CheckinInboxElement extends CheckinElement {
     this._activities = activities
   }
 
-  async isGeo(object) {
+  isGeo(object) {
     return ['Arrive', 'Leave', 'Travel'].includes(object.type)
   }
 

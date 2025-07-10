@@ -35,7 +35,7 @@ export class CheckinActivityElement extends CheckinElement {
         (this.activity.summary)
         ? unsafeHTML(DOMPurify(this.activity.summary))
           : (this.activity.summaryMap?.en)
-            ? unsafeHTML(DOMPurify(this.activity.summaryMap.en))
+            ? unsafeHTML(DOMPurify(this.activity.summaryMap?.en))
             : this.makeSummary()
       }
       </p>
@@ -47,23 +47,23 @@ export class CheckinActivityElement extends CheckinElement {
   }
 
   makeSummary() {
-    const actorName = this._actor?.name || "(someone)"
+    const actorName = this.activity.actor?.name || "(someone)"
     switch (this.activity.type) {
       case "Arrive": {
-        const place = this._location
+        const place = this.activity.location
         const placeName = place?.name || "(somewhere)"
         return html`${actorName} arrived at ${placeName}`
         break;
       }
       case "Leave": {
-        const place = this._object
+        const place = this.activity.object
         const placeName = place?.name || "(somewhere)"
         return html`${actorName} left ${placeName}`
         break;
       }
       case "Travel": {
-        const target = this._target
-        const origin = this._origin
+        const target = this.activity.target
+        const origin = this.activity.origin
         const targetName = target?.name || "(somewhere)"
         const originName = origin?.name || "(somewhere)"
         return html`${actorName} travelled from ${originName} to ${targetName}`
@@ -71,25 +71,6 @@ export class CheckinActivityElement extends CheckinElement {
       }
       default: {
         return html`(Unknown activity)`
-      }
-    }
-  }
-
-  updated(changedProperties) {
-    super.updated(changedProperties);
-    if (changedProperties.has('activity')) {
-      const activity = changedProperties.get('activity')
-      if (activity.actor) {
-        this.toObject(activity.actor).then(o => this._actor = o)
-      }
-      if (activity.location) {
-        this.toObject(activity.location).then(o => this._location = o)
-      }
-      if (activity.origin) {
-        this.toObject(activity.origin).then(o => this._origin = o)
-      }
-      if (activity.target) {
-        this.toObject(activity.target).then(o => this._target = o)
       }
     }
   }
