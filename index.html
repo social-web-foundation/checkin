@@ -82,7 +82,7 @@
       }
 
       async function ensureFreshToken() {
-        const expires = parseInt(sessionStorage.getItem("expires"))
+        const expires = parseInt(sessionStorage.getItem("expires"));
         if (Date.now() > expires) {
           const url = sessionStorage.getItem("oauth_token_url");
           const refresh_token = sessionStorage.getItem("refresh_token");
@@ -203,22 +203,96 @@
         }
       }
 
+      function bbox(lat, lon, distance) {
+        const EARTH_RADIUS_M = 6_371_000;
+        const degToRad = Math.PI / 180;
+        const radToDeg = 180 / Math.PI;
+
+        // convert center latitude to radians
+        const latRad = lat * degToRad;
+
+        // angular distance in radians on the earth’s surface
+        const radDist = distance / EARTH_RADIUS_KM;
+
+        // delta in degrees latitude
+        const deltaLat = radDist * radToDeg;
+
+        // delta in degrees longitude, corrected by latitude
+        const deltaLon = (radDist * radToDeg) / Math.cos(latRad);
+
+        const minLat = lat - deltaLat;
+        const maxLat = lat + deltaLat;
+        const minLon = lon - deltaLon;
+        const maxLon = lon + deltaLon;
+
+        return [minLat, minLon, maxLat, maxLon];
+      }
+
       async function mainLayout() {
         const main = document.querySelector(".main");
         const actorId = sessionStorage.getItem("actor_id");
         const res = await apFetch(actorId);
-        const actor = (res.ok) ? await res.json() : null;
+        const actor = res.ok ? await res.json() : null;
         main.innerHTML = `
         <nav class="navbar">
           <span class="app-title">Checkin</span>
           <sl-button id="logout-btn" variant="danger" size="small">Logout</sl-button>
         </nav>
-        <div class="welcome">
-          <sl-alert open variant="primary">
-            ${actor?.name}, you are logged in!
-          </sl-alert>
+        <div class="location-container">
+          <sl-button id="get-location-btn" variant="primary" size="small">Get Nearby Places</sl-button>
+          <div id="places-list" style="margin-top: 1em;"></div>
         </div>
         `;
+        document
+          .getElementById("get-location-btn")
+          .addEventListener("click", async () => {
+            const placesList = document.getElementById("places-list");
+            placesList.innerHTML = "";
+
+            if (!navigator.geolocation) {
+              placesList.innerHTML = `<sl-alert open variant="danger">Geolocation is not supported by your browser.</sl-alert>`;
+              return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+              async (position) => {
+                const { latitude, longitude } = position.coords;
+                sessionStorage.setItem("latitude", latitude);
+                sessionStorage.setItem("longitude", longitude);
+
+                try {
+                  const [minLatitude, minLongitude, maxLatitude, maxLongitude] = bbox(latitude, longitude, 100)
+
+                  const res = await fetch(
+                    `https://places.pub/search?&bbox=${minLatitude},${minLongitude},${maxLatitude},${maxLongitude})`
+                  );
+
+                  if (!res.ok) {
+                    throw new Error("Failed to fetch nearby places.");
+                  }
+                  const places = await res.json();
+                  if (places.items.length === 0) {
+                    placesList.innerHTML = `<sl-alert open variant="warning">No nearby places found within 1 km.</sl-alert>`;
+                  } else {
+                    placesList.innerHTML = `
+                <ul>
+            ${places.items.map(
+                (place) =>
+                  `<li>${place.name}</li>`
+              )
+              .join("")}
+                </ul>
+              `;
+                  }
+                } catch (error) {
+                  placesList.innerHTML = `<sl-alert open variant="danger">${error.message}</sl-alert>`;
+                }
+              },
+              (error) => {
+                placesList.innerHTML = `<sl-alert open variant="danger">Error getting location: ${error.message}</sl-alert>`;
+              }
+            );
+          });
         // Logout handler
         document.getElementById("logout-btn").addEventListener("click", () => {
           sessionStorage.removeItem("access_token");
