@@ -104,4 +104,46 @@ export class CheckinElement extends LitElement {
     }
     return await res.json();
   }
+
+  async *items(coll) {
+    const collection = await this.toObject(coll)
+    if (collection.items) {
+      for (const item of collection.items) {
+        yield await this.toObject(item)
+      }
+    } else if (collection.orderedItems) {
+      for (const item of collection.orderedItems) {
+        yield await this.toObject(item)
+      }
+    } else if (collection.first) {
+      let pageId = await this.toId(collection.first)
+      do {
+        const page = await this.toObject(pageId)
+        if (page.items) {
+          for (const item of page.items) {
+            yield await this.toObject(item)
+          }
+        } else if (page.orderedItems) {
+          for (const item of page.orderedItems) {
+            yield await this.toObject(item)
+          }
+        }
+        pageId = await this.toId(page.next)
+      } while (pageId)
+    }
+  }
+
+  async toId(item) {
+    return (typeof item == 'string')
+          ? item
+          : (typeof item == 'object' && item.id && typeof item.id == 'string')
+            ? item.id
+            : null
+  }
+
+  async toObject(item) {
+    const id = await this.toId(item)
+    const res = await this.apFetch(id)
+    return await res.json()
+  }
 }
