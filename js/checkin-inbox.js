@@ -85,11 +85,11 @@ export class CheckinInboxElement extends LitElement {
       do {
         const page = await this.toObject(pageId)
         if (page.items) {
-          for (const item of collection.items) {
+          for (const item of page.items) {
             yield await this.toObject(item)
           }
         } else if (page.orderedItems) {
-          for (const item of collection.orderedItems) {
+          for (const item of page.orderedItems) {
             yield await this.toObject(item)
           }
         }
