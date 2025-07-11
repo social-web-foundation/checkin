@@ -3,12 +3,12 @@ import {
   css,
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
-import { render } from 'https://cdn.jsdelivr.net/npm/@lit-labs/ssr@latest/+esm';
+import { render } from "https://cdn.jsdelivr.net/npm/@lit-labs/ssr@latest/+esm";
+import { collectResult } from "https://cdn.jsdelivr.net/npm/@lit-labs/ssr@latest/lib/render-result.js+esm";
 
-import { CheckinElement } from './checkin-element.js'
+import { CheckinElement } from "./checkin-element.js";
 
 export class CheckinMainElement extends CheckinElement {
-
   static get properties() {
     return {
       redirectUri: { type: String, attribute: "redirect-uri" },
@@ -46,7 +46,7 @@ export class CheckinMainElement extends CheckinElement {
       }
 
       const collection = await res.json();
-      this._places = collection.items.filter(p => p.name)
+      this._places = collection.items.filter((p) => p.name);
     });
   }
 
@@ -107,7 +107,7 @@ export class CheckinMainElement extends CheckinElement {
                 )}
               </ul>
             </div>`
-          : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`}
+          : html`<sl-spinner style="font-size: 2rem;"></sl-spinner>`}
       </div>
     `;
   }
@@ -115,28 +115,28 @@ export class CheckinMainElement extends CheckinElement {
   async _checkin(e) {
     const btn = e.currentTarget;
     const placeId = btn.dataset.placeId;
-    const place = await this.toObject(placeId)
-    const actor = await this.getActor()
+    const place = await this.toObject(placeId);
+    const actor = await this.getActor();
     let activity = {
       actor: actor,
       type: "Arrive",
       location: place,
       to: "https://www.w3.org/ns/activitystreams#Public",
-    }
+    };
 
     // makeSummary() returns a Template object. This renders it to
     // HTML to be sent across the wire
 
     activity.summaryMap = {
-      en: render(this.makeSummary(activity))
-    }
+      en: await collectResult(render(await this.makeSummary(activity))),
+    };
     activity = await this.doActivity(activity);
 
     // Go to the inbox
-    const next = document.createElement('checkin-inbox');
-    next.setAttribute('redirect-uri', this.redirectUri)
-    next.setAttribute('client-id', this.cliendId)
-    this.replaceWith(next)
+    const next = document.createElement("checkin-inbox");
+    next.setAttribute("redirect-uri", this.redirectUri);
+    next.setAttribute("client-id", this.cliendId);
+    this.replaceWith(next);
   }
 
   _logout() {
@@ -144,7 +144,7 @@ export class CheckinMainElement extends CheckinElement {
     sessionStorage.removeItem("refresh_token");
     sessionStorage.removeItem("expires_in");
     sessionStorage.removeItem("actor_id");
-    window.location = this.redirectUri
+    window.location = this.redirectUri;
   }
 }
 
