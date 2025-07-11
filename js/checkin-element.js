@@ -191,7 +191,7 @@ export class CheckinElement extends LitElement {
         : def
       : def
     const url = this.getUrl(object)
-    const part = (url)
+    return (url)
       ? `<a href="${this.attrEscape(url)}">${this.contentEscape(name)}</a>`
       : `${this.contentEscape(name)}`
   }
