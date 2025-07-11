@@ -55,21 +55,19 @@ export class CheckinInboxElement extends CheckinElement {
       sessionStorage.setItem("inbox", inbox);
     }
 
-    const activities = []
+    this._activities = []
 
     for await (const activity of this.items(inbox)) {
       if (this.isGeo(activity)) {
-        activities.push(activity)
+        this._activities.push(activity)
       }
-      if (activities.length >= this.MAX_ACTIVITIES) {
+      if (this._activities.length >= this.MAX_ACTIVITIES) {
         break;
       }
       if ((new Date(activity.published)).getTime() <= Date.now() - this.MAX_TIME_WINDOW) {
         break;
       }
     }
-
-    this._activities = activities
   }
 
   isGeo(object) {
