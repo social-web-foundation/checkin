@@ -18,6 +18,9 @@
   <body>
     <div id="main"></div>
     <script type="module">
+      const client_id = 'https://checkin.swf.pub/client.jsonld'
+      const redirect_uri = 'https://checkin.swf.pub/'
+
       const routes = {
         login: () => `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri} />`,
         inbox: () => `<checkin-inbox client-id=${client_id} redirect-uri=${redirect_uri} />`,
