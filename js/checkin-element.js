@@ -1,9 +1,4 @@
-import {
-  html,
-  css,
-  LitElement,
-  unsafeHTML,
-} from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
+ import { html, css, LitElement, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
 
 export class CheckinElement extends LitElement {
 
