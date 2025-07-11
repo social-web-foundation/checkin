@@ -115,7 +115,7 @@ export class CheckinMainElement extends CheckinElement {
   async _checkin(e) {
     const btn = e.currentTarget;
     const placeId = btn.dataset.placeId;
-    const place = await this.getObject(placeId)
+    const place = await this.toObject(placeId)
     const actor = await this.getActor()
     let activity = {
       actor: actor,
