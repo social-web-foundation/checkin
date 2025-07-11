@@ -168,6 +168,22 @@ export class CheckinElement extends LitElement {
     }
   }
 
+  attrEscape(s) {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  contentEscape(s) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  }
+
   makeSummaryPart(object, def = '(something)') {
     const name = (object)
       ? (object.name)
@@ -176,8 +192,8 @@ export class CheckinElement extends LitElement {
       : def
     const url = this.getUrl(object)
     const part = (url)
-      ? html`<a href="${url}">${name}</a>`
-      : html`${name}`
+      ? `<a href="${this.attrEscape(url)}">${this.contentEscape(name)}</a>`
+      : `${this.contentEscape(name)}`
   }
 
   makeSummary(activity) {
@@ -185,22 +201,22 @@ export class CheckinElement extends LitElement {
     switch (activity.type) {
       case "Arrive": {
         const placePart = this.makeSummaryPart(activity.location, '(somewhere)')
-        return unsafeHTML`${actorPart} arrived at ${placePart}`
+        return `${actorPart} arrived at ${placePart}`
         break;
       }
       case "Leave": {
         const placePart = this.makeSummaryPart(activity.object, '(somewhere)')
-        return unsafeHTML`${actorPart} left ${placePart}`
+        return `${actorPart} left ${placePart}`
         break;
       }
       case "Travel": {
         const targetPart = this.makeSummaryPart(activity.target, '(somewhere)')
         const originPart = this.makeSummaryPart(activity.origin, '(somewhere)')
-        return unsafeHTML`${actorPart} travelled from ${originPart} to ${targetPart}`
+        return `${actorPart} travelled from ${originPart} to ${targetPart}`
         break;
       }
       default: {
-        return html`(Unknown activity)`
+        return `(Unknown activity)`
       }
     }
   }
