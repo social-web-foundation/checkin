@@ -115,21 +115,15 @@ export class CheckinMainElement extends CheckinElement {
   async _checkin(e) {
     const btn = e.currentTarget;
     const placeId = btn.dataset.placeId;
-    const placeName = btn.dataset.placeName;
+    const place = await this.getObject(placeId)
     const actor = await this.getActor()
     let activity = {
-      actor: {
-        id: actor.id,
-        name: actor.name
-      },
+      actor: actor,
       type: "Arrive",
-      location: {
-        id: placeId,
-        name: placeName
-      },
+      location: place,
       to: "https://www.w3.org/ns/activitystreams#Public",
     }
-    
+
     // makeSummary() returns a Template object. This renders it to
     // HTML to be sent across the wire
 
