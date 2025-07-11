@@ -3,6 +3,7 @@ import {
   css,
   LitElement,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
+import { render } from 'https://cdn.jsdelivr.net/npm/@lit-labs/ssr@latest/+esm';
 
 import { CheckinElement } from './checkin-element.js'
 
@@ -128,10 +129,16 @@ export class CheckinMainElement extends CheckinElement {
       },
       to: "https://www.w3.org/ns/activitystreams#Public",
     }
+    
+    // makeSummary() returns a Template object. This renders it to
+    // HTML to be sent across the wire
+
     activity.summaryMap = {
-      en: this.makeSummary(activity)
+      en: render(this.makeSummary(activity))
     }
     activity = await this.doActivity(activity);
+
+    // Go to the inbox
     const next = document.createElement('checkin-inbox');
     next.setAttribute('redirect-uri', this.redirectUri)
     next.setAttribute('client-id', this.cliendId)
