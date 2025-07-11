@@ -116,14 +116,22 @@ export class CheckinMainElement extends CheckinElement {
     const placeId = btn.dataset.placeId;
     const placeName = btn.dataset.placeName;
     const actor = await this.getActor()
-    await this.doActivity({
+    let activity = {
+      actor: {
+        id: actor.id,
+        name: actor.name
+      },
       type: "Arrive",
-      location: placeId,
-      summaryMap: {
-        en: `${actor.name} arrived at ${placeName}`,
+      location: {
+        id: placeId,
+        name: placeName
       },
       to: "https://www.w3.org/ns/activitystreams#Public",
-    });
+    }
+    activity.summaryMap = {
+      en: this.makeSummary(activity)
+    }
+    activity = await this.doActivity(activity);
     const next = document.createElement('checkin-inbox');
     next.setAttribute('redirect-uri', this.redirectUri)
     next.setAttribute('client-id', this.cliendId)

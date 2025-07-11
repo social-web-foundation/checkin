@@ -36,7 +36,7 @@ export class CheckinActivityElement extends CheckinElement {
         ? unsafeHTML(DOMPurify.sanitize(this.activity.summary))
           : (this.activity.summaryMap?.en)
             ? unsafeHTML(DOMPurify.sanitize(this.activity.summaryMap?.en))
-            : this.makeSummary()
+            : this.makeSummary(this.activity)
       }
       </p>
       <p>
@@ -44,35 +44,6 @@ export class CheckinActivityElement extends CheckinElement {
       </p>
       </div>
     `
-  }
-
-  makeSummary() {
-    const actorName = this.activity.actor?.name || "(someone)"
-    switch (this.activity.type) {
-      case "Arrive": {
-        const place = this.activity.location
-        const placeName = place?.name || "(somewhere)"
-        return html`${actorName} arrived at ${placeName}`
-        break;
-      }
-      case "Leave": {
-        const place = this.activity.object
-        const placeName = place?.name || "(somewhere)"
-        return html`${actorName} left ${placeName}`
-        break;
-      }
-      case "Travel": {
-        const target = this.activity.target
-        const origin = this.activity.origin
-        const targetName = target?.name || "(somewhere)"
-        const originName = origin?.name || "(somewhere)"
-        return html`${actorName} travelled from ${originName} to ${targetName}`
-        break;
-      }
-      default: {
-        return html`(Unknown activity)`
-      }
-    }
   }
 }
 

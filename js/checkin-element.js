@@ -2,6 +2,7 @@ import {
   html,
   css,
   LitElement,
+  unsafeHTML,
 } from "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js";
 
 export class CheckinElement extends LitElement {
@@ -24,7 +25,7 @@ export class CheckinElement extends LitElement {
       outbox = actor.outbox;
       sessionStorage.setItem("outbox", outbox);
     }
-    await this.apFetch(outbox, {
+    const res = await this.apFetch(outbox, {
       method: "POST",
       headers: {
         "Content-Type": "application/activity+json",
@@ -34,6 +35,7 @@ export class CheckinElement extends LitElement {
         ...obj,
       }),
     });
+    return await res.json()
   }
 
   async ensureFreshToken() {
@@ -145,5 +147,66 @@ export class CheckinElement extends LitElement {
     const id = await this.toId(item)
     const res = await this.apFetch(id)
     return await res.json()
+  }
+
+  getUrl(object) {
+    if (!object) return null
+    if (!(typeof object) == 'object') return null
+    if (!(object.url)) return null
+    switch (typeof object.url) {
+      case 'string':
+        return object.url
+      case 'object':
+        if (Array.isArray(object.url)) {
+          const htmlLink = object.url.find(l => typeof l == 'object' && l.mediaType && l.mediaType.startsWith('text/html'))
+          if (htmlLink) {
+            return htmlLink.href
+          } else if (object.url.length > 0) {
+            return object.url[0].href
+          } else {
+            return null
+          }
+        } else {
+          return object.url.href
+        }
+        break
+    }
+  }
+
+  makeSummaryPart(object, def = '(something)') {
+    const name = (object)
+      ? (object.name)
+        ? object.name
+        : def
+      : def
+    const url = this.getUrl(object)
+    const part = (url)
+      ? html`<a href="${url}">${name}</a>`
+      : html`${name}`
+  }
+
+  makeSummary(activity) {
+    const actorPart = this.makeSummaryPart(activity.actor, '(someone)')
+    switch (activity.type) {
+      case "Arrive": {
+        const placePart = this.makeSummaryPart(activity.location, '(somewhere)')
+        return unsafeHTML`${actorPart} arrived at ${placePart}`
+        break;
+      }
+      case "Leave": {
+        const placePart = this.makeSummaryPart(activity.object, '(somewhere)')
+        return unsafeHTML`${actorPart} left ${placePart}`
+        break;
+      }
+      case "Travel": {
+        const targetPart = this.makeSummaryPart(activity.target, '(somewhere)')
+        const originPart = this.makeSummaryPart(activity.origin, '(somewhere)')
+        return unsafeHTML`${actorPart} travelled from ${originPart} to ${targetPart}`
+        break;
+      }
+      default: {
+        return html`(Unknown activity)`
+      }
+    }
   }
 }
