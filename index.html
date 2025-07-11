@@ -18,17 +18,30 @@
   <body>
     <div id="main"></div>
     <script type="module">
-      const client_id = "https://checkin.swf.pub/client.jsonld";
-      const redirect_uri = "https://checkin.swf.pub/";
+      const routes = {
+        login: () => `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri} />`,
+        inbox: () => `<checkin-inbox client-id=${client_id} redirect-uri=${redirect_uri} />`,
+        save: () => `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`,
+      };
 
-      document.addEventListener("DOMContentLoaded", async function () {
+      function navigate(route) {
+        document.getElementById("main").innerHTML = routes[route] ? routes[route]() : `<h1>404 - Page Not Found</h1>`;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);
-        document.getElementById("main").innerHTML =
-          (params.get("state"))
-          ? `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`
-          : (sessionStorage.getItem("access_token"))
-            ? `<checkin-inbox client-id=${client_id} redirect-uri=${redirect_uri} />`
-            : `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri}  />`;
+        if (params.get("state")) {
+          navigate("save");
+        } else if (sessionStorage.getItem("access_token")) {
+          navigate("inbox");
+        } else {
+          navigate("login");
+        }
+      });
+
+      window.addEventListener("popstate", () => {
+        const route = window.location.hash.replace("#", "") || "login";
+        navigate(route);
       });
     </script>
   </body>
