@@ -26,7 +26,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     super.connectedCallback()
     this.getPosition()
       .then((pos) => {
-        const { latitude, longitude } = position.coords
+        const { latitude, longitude } = pos.coords
         this._lat = latitude
         this._lon = longitude
         this.getPlaces(latitude, longitude)
@@ -42,7 +42,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
       })
   }
 
-  getPosition() {
+  getPosition () {
     return new Promise((resolve, reject) => {
       try {
         navigator.geolocation.getCurrentPosition(resolve)
@@ -52,23 +52,23 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     })
   }
 
-  async getPlaces(latitude, longitude) {
-      const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
-        latitude,
-        longitude,
-        100
-      )
+  async getPlaces (latitude, longitude) {
+    const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
+      latitude,
+      longitude,
+      100
+    )
 
-      const res = await fetch(
+    const res = await fetch(
        `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
-     )
+    )
 
-     if (!res.ok) {
-        throw new Error('Failed to fetch nearby places.')
-      }
+    if (!res.ok) {
+      throw new Error('Failed to fetch nearby places.')
+    }
 
-      const collection = await res.json()
-      return collection.items.filter((p) => p.name)
+    const collection = await res.json()
+    return collection.items.filter((p) => p.name)
   }
 
   bbox (lat, lon, distance) {
@@ -100,6 +100,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     return (this._error)
       ? html`<sl-alert>${this._error}</sl-alert>`
       : html`
+      <h2>Nearby places</h2>
       <div class="location-container">
         ${this._places
           ? html`<div id="places-list" style="margin-top: 1em;">
@@ -144,7 +145,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     activity = await this.doActivity(activity)
 
     // Go to the inbox
-    window.location.hash = ""
+    window.location.hash = ''
   }
 }
 
