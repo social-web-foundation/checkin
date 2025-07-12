@@ -28,9 +28,19 @@ export class CheckinInboxElement extends CheckinElement {
 
   connectedCallback() {
     super.connectedCallback();
+    activitiesJSON = sessionStorage.getItem('inbox-activities')
+    if (activitiesJSON) {
+      this._activities = JSON.parse(activitiesJSON)
+    }
     this
-      .getActivities()
+      .getNewerActivities()
       .catch((err) => this._error = err.message)
+      .then(() => {
+        sessionStorage.setItem(
+          'inbox-activities',
+          JSON.stringify(this._activities)
+        )
+      })
   }
 
   render() {
@@ -47,7 +57,7 @@ export class CheckinInboxElement extends CheckinElement {
     : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
   }
 
-  async getActivities() {
+  async getNewerActivities() {
     let inbox = sessionStorage.getItem("inbox");
     if (!inbox) {
       const actor = await this.getActor();
@@ -55,9 +65,16 @@ export class CheckinInboxElement extends CheckinElement {
       sessionStorage.setItem("inbox", inbox);
     }
 
+    const latestId = (this._activities && this._activities.length > 0)
+      ? this._activities[0].id
+      : null
+
     const activities = []
 
     for await (const activity of this.items(inbox)) {
+      if (latestId && activity.id === latestId) {
+        break;
+      }
       if (this.isGeo(activity)) {
         activities.push(activity)
       }
@@ -70,6 +87,8 @@ export class CheckinInboxElement extends CheckinElement {
     }
 
     this._activities = activities
+      .concat(this._activities)
+      .slice(0, this.MAX_ACTIVITIES)
   }
 
   isGeo(object) {

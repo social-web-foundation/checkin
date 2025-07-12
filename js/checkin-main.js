@@ -136,10 +136,7 @@ export class CheckinMainElement extends CheckinElement {
   }
 
   _logout() {
-    sessionStorage.removeItem("access_token");
-    sessionStorage.removeItem("refresh_token");
-    sessionStorage.removeItem("expires_in");
-    sessionStorage.removeItem("actor_id");
+    sessionStorage.clear();
     window.location = this.redirectUri;
   }
 }

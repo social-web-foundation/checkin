@@ -94,16 +94,23 @@ export class CheckinElement extends LitElement {
   }
 
   async getActor() {
-    const actorId = sessionStorage.getItem("actor_id")
-    const res = await this.apFetch(actorId);
-    if (!res.ok) {
-      throw new Error("Failure fetching actor");
+    const actorJSON = sessionStorage.getItem("actor")
+    if (actorJSON) {
+      return JSON.parse(actorJSON)
+    } else {
+      const actorId = sessionStorage.getItem("actor_id")
+      const res = await this.apFetch(actorId);
+      if (!res.ok) {
+        throw new Error("Failure fetching actor");
+      }
+      const actor = await res.json();
+      sessionStorage.setItem("actor", JSON.stringify(actor))
+      return actor
     }
-    return await res.json();
   }
 
   async *items(coll) {
-    const collection = await this.toObject(coll)
+    const collection = await this.toObject(coll, {noCache: true})
     if (collection.items) {
       for (const item of collection.items) {
         yield await this.toObject(item)
@@ -115,7 +122,7 @@ export class CheckinElement extends LitElement {
     } else if (collection.first) {
       let pageId = await this.toId(collection.first)
       do {
-        const page = await this.toObject(pageId)
+        const page = await this.toObject(pageId, {noCache: true})
         if (page.items) {
           for (const item of page.items) {
             yield await this.toObject(item)
@@ -138,10 +145,21 @@ export class CheckinElement extends LitElement {
             : null
   }
 
-  async toObject(item) {
+  async toObject(item, options = {}) {
+    const { noCache } = options
     const id = await this.toId(item)
+    if (!noCache) {
+      const json = sessionStorage.getItem(`cache:${id}`)
+      if (json) {
+        return JSON.parse(json)
+      }
+    }
     const res = await this.apFetch(id)
-    return await res.json()
+    const json = await res.json()
+    if (!noCache) {
+      sessionStorage.setItem(`cache:${id}`, json)
+    }
+    return json
   }
 
   getUrl(object) {
