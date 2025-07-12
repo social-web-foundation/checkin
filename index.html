@@ -12,6 +12,16 @@
       src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js"
     ></script>
     <style>
+      :root {
+        --max-width: 100em;
+        --gap: 1rem;
+      }
+      body {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100vh;
+        margin: 0;
+      }
       .spinner-page {
         display: flex;
         justify-content: center;

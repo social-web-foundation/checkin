@@ -11,18 +11,6 @@ import { CheckinInboxElement } from './checkin-inbox.js'
 export class CheckinHomeElement extends CheckinElement {
 
   static styles = css`
-    :root {
-      --max-width: 100em;
-      --gap: 1rem;
-    }
-
-    body {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      min-height: 100vh;
-      margin: 0;
-    }
-
     header, main, footer {
       width: 100%;
       max-width: var(--max-width);
