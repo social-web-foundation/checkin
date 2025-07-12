@@ -132,9 +132,17 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     const place = await this.toObject(placeId)
     const actor = await this.getActor()
     let activity = {
-      actor,
+      actor: {
+        id: actor.id,
+        name: actor.name,
+        url: actor.url
+      },
       type: 'Arrive',
-      location: place,
+      location: {
+        id: place.id,
+        name: place.name,
+        url: place.url
+      },
       to: 'https://www.w3.org/ns/activitystreams#Public'
     }
 
