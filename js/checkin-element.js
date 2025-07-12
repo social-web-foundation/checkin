@@ -156,7 +156,7 @@ export class CheckinElement extends LitElement {
     const res = await this.apFetch(id)
     const json = await res.json()
     if (!noCache) {
-      sessionStorage.setItem(`cache:${id}`, json)
+      sessionStorage.setItem(`cache:${id}`, JSON.stringify(json))
     }
     return json
   }
