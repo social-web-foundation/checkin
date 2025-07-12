@@ -58,7 +58,11 @@ export class CheckinHomeElement extends CheckinElement {
 
     <header>
 
-      <span class="brand">Checkin</span>
+      <span class="brand"><a href="#">Checkin</a></span>
+
+      <sl-button href="#checkin" variant="primary">
+        +
+      </sl-button>
 
       <!-- User menu dropdown -->
       <sl-dropdown>
