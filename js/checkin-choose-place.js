@@ -27,8 +27,8 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     this.getPosition()
       .then((pos) => {
         const { latitude, longitude } = pos.coords
-        this._lat = latitude
-        this._lon = longitude
+        this._lat = Number(latitude.toFixed(5))
+        this._lon = Number(longitude.toFixed(5))
         this.getPlaces(latitude, longitude)
           .then((places) => {
             this._places = places
@@ -53,6 +53,13 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   }
 
   async getPlaces (latitude, longitude) {
+
+    const cached = sessionStorage.getItem(`places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`)
+
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
     const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
       latitude,
       longitude,
@@ -68,7 +75,9 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     }
 
     const collection = await res.json()
-    return collection.items.filter((p) => p.name)
+    const places = collection.items.filter((p) => p.name)
+    sessionStorage.setItem(`places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`, JSON.stringify(places))
+    return places
   }
 
   bbox (lat, lon, distance) {
@@ -88,10 +97,10 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     // delta in degrees longitude, corrected by latitude
     const deltaLon = (radDist * radToDeg) / Math.cos(latRad)
 
-    const minLat = lat - deltaLat
-    const maxLat = lat + deltaLat
-    const minLon = lon - deltaLon
-    const maxLon = lon + deltaLon
+    const minLat = Number((lat - deltaLat).toFixed(5))
+    const maxLat = Number((lat + deltaLat).toFixed(5))
+    const minLon = Number((lon - deltaLon).toFixed(5))
+    const maxLon = Number((lon + deltaLon).toFixed(5))
 
     return [minLon, minLat, maxLon, maxLat]
   }
