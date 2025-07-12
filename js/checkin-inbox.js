@@ -8,7 +8,6 @@ import { CheckinElement } from './checkin-element.js'
 import { CheckinActivityElement } from './checkin-activity.js'
 
 export class CheckinInboxElement extends CheckinElement {
-
   static styles = css`
   .spinner-container {
     display: flex;
@@ -67,7 +66,6 @@ export class CheckinInboxElement extends CheckinElement {
   }
 
   async getActivities () {
-
     const activitiesJSON = sessionStorage.getItem('inbox-activities')
     const cached = (activitiesJSON)
       ? JSON.parse(activitiesJSON)

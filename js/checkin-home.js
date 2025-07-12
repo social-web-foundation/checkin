@@ -9,7 +9,6 @@ import { CheckinChoosePlaceElement } from './checkin-choose-place.js'
 import { CheckinInboxElement } from './checkin-inbox.js'
 
 export class CheckinHomeElement extends CheckinElement {
-
   static styles = css`
     header, main, footer {
       width: 100%;
@@ -35,22 +34,22 @@ export class CheckinHomeElement extends CheckinElement {
 
   constructor () {
     super()
-    this._route = "inbox"
+    this._route = 'inbox'
   }
 
   connectedCallback () {
     super.connectedCallback()
 
-    window.addEventListener("popstate", () => {
+    window.addEventListener('popstate', () => {
       const route = (window.location.hash)
-        ? window.location.hash.replace("#", "")
-        : "inbox"
-      if (route === "logout") {
+        ? window.location.hash.replace('#', '')
+        : 'inbox'
+      if (route === 'logout') {
         this._logout()
       } else {
         this._route = route
       }
-    });
+    })
   }
 
   render () {
