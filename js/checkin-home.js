@@ -9,8 +9,16 @@ import { CheckinChoosePlaceElement } from './checkin-choose-place.js'
 import { CheckinInboxElement } from './checkin-inbox.js'
 
 export class CheckinHomeElement extends CheckinElement {
-  static styles = css`
-    header, main, footer {
+    static styles = css`
+    :host {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100vh;
+    }
+
+    header,
+    main,
+    footer {
       width: 100%;
       max-width: var(--max-width);
       margin: 0 auto;
@@ -22,7 +30,8 @@ export class CheckinHomeElement extends CheckinElement {
       align-items: center;
       justify-content: space-between;
     }
-  `
+  `;
+
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
