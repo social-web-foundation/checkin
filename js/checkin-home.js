@@ -35,6 +35,7 @@ export class CheckinHomeElement extends CheckinElement {
 
   constructor () {
     super()
+    this._route = "inbox"
   }
 
   connectedCallback () {
