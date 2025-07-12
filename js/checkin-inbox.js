@@ -16,7 +16,7 @@ export class CheckinInboxElement extends CheckinElement {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
       _error: { type: String, state: true },
-      _activities: { type: Array, state: true }
+      _activities: { type: Array, state: true, default: [] }
     }
   }
 
@@ -26,19 +26,12 @@ export class CheckinInboxElement extends CheckinElement {
 
   connectedCallback () {
     super.connectedCallback()
-    const activitiesJSON = sessionStorage.getItem('inbox-activities')
-    if (activitiesJSON) {
-      this._activities = JSON.parse(activitiesJSON)
-    }
     this
-      .getNewerActivities()
-      .catch((err) => this._error = err.message)
-      .then(() => {
-        sessionStorage.setItem(
-          'inbox-activities',
-          JSON.stringify(this._activities)
-        )
+      .getActivities()
+      .then((activities) => {
+        this._activities = activities
       })
+      .catch((err) => this._error = err.message)
   }
 
   render () {
@@ -55,16 +48,22 @@ export class CheckinInboxElement extends CheckinElement {
       : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
   }
 
-  async getNewerActivities () {
+  async getActivities () {
+
+    const activitiesJSON = sessionStorage.getItem('inbox-activities')
+    const cached = (activitiesJSON)
+      ? JSON.parse(activitiesJSON)
+      : []
+
     let inbox = sessionStorage.getItem('inbox')
     if (!inbox) {
       const actor = await this.getActor()
-      inbox = actor.inbox
+      inbox = await this.toId(actor.inbox)
       sessionStorage.setItem('inbox', inbox)
     }
 
-    const latestId = (this._activities && this._activities.length > 0)
-      ? this._activities[0].id
+    const latestId = (cached && cached.length > 0)
+      ? cached[0].id
       : null
 
     const activities = []
@@ -84,9 +83,13 @@ export class CheckinInboxElement extends CheckinElement {
       }
     }
 
-    this._activities = activities
-      .concat(this._activities)
+    const result = activities
+      .concat(cached)
       .slice(0, this.MAX_ACTIVITIES)
+
+    sessionStorage.setItem('inbox-activities', JSON.stringify(result))
+
+    return result
   }
 
   isGeo (object) {
