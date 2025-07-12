@@ -7,6 +7,18 @@ import {
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinInboxElement extends CheckinElement {
+
+  static styles = css`
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .half-spinner {
+    --size: 50%;
+  }
+  `
+
   MAX_ACTIVITIES = 20
   MAX_TIME_WINDOW = 3 * 24 * 60 * 60 * 1000 // three days
 
@@ -38,15 +50,19 @@ export class CheckinInboxElement extends CheckinElement {
       ? html`<sl-alert>${this._error}</sl-alert>`
       : (this._activities)
         ? html`
-      <sl-button @click=${this._startCheckin.bind(this)}>Checkin</sl-button>
-      <div class="inbox-activities">
-      ${this._activities.map(a =>
-        html`<checkin-activity .activity=${a}></checkin-activity>`
-        )
-      }
-      </div>
-      `
-        : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
+          <h2>Latest activities</h2>
+          <div class="inbox-activities">
+          ${this._activities.map(a =>
+            html`<checkin-activity .activity=${a}></checkin-activity>`
+            )
+          }
+          </div>
+          `
+        : html`
+          <div class="spinner-container">
+            <sl-spinner class="half-spinner"></sl-spinner>
+          </div>
+          `
   }
 
   async getActivities () {
