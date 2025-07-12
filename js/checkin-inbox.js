@@ -49,19 +49,19 @@ export class CheckinInboxElement extends CheckinElement {
   render () {
     return (this._error)
       ? html`<sl-alert>${this._error}</sl-alert>`
-      : (this._activities)
-        ? html`
+      : html`
           <h2>Latest activities</h2>
           <div class="inbox-activities">
-          ${this._activities.map(a =>
-            html`<checkin-activity .activity=${a}></checkin-activity>`
-            )
+          ${(this._activities)
+            ? this._activities.map(a =>
+                html`<checkin-activity .activity=${a}></checkin-activity>`
+              )
+            : html`
+              <div class="spinner-container">
+                <sl-spinner class="half-spinner"></sl-spinner>
+              </div>
+              `
           }
-          </div>
-          `
-        : html`
-          <div class="spinner-container">
-            <sl-spinner class="half-spinner"></sl-spinner>
           </div>
           `
   }
