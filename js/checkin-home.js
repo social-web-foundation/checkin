@@ -53,9 +53,14 @@ export class CheckinHomeElement extends CheckinElement {
     super.connectedCallback()
 
     window.addEventListener("popstate", () => {
-      this._route = (window.location.hash)
+      const route = (window.location.hash)
         ? window.location.hash.replace("#", "")
         : "inbox"
+      if (route === "logout") {
+        this._logout()
+      } else {
+        this._route = route
+      }
     });
   }
 
@@ -70,9 +75,8 @@ export class CheckinHomeElement extends CheckinElement {
       <sl-dropdown>
         <sl-button slot="trigger" caret>Username</sl-button>
         <sl-menu>
-          <sl-menu-item value="profile">Profile</sl-menu-item>
-          <sl-menu-item value="settings">Settings</sl-menu-item>
-          <sl-menu-item value="logout">Log out</sl-menu-item>
+          <sl-menu-item href="#settings">Settings</sl-menu-item>
+          <sl-menu-item href="#logout">Log out</sl-menu-item>
         </sl-menu>
       </sl-dropdown>
     </header>
