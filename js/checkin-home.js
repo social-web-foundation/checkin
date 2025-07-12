@@ -82,9 +82,15 @@ export class CheckinHomeElement extends CheckinElement {
       <!-- User menu dropdown -->
       <sl-dropdown>
         <sl-button slot="trigger" caret>${(this._actor) ? this._actor.name : "User"}</sl-button>
-        <sl-menu>
-          <sl-menu-item href="#settings">Settings</sl-menu-item>
-          <sl-menu-item href="#logout">Log out</sl-menu-item>
+        <sl-menu @sl-select=${this._menuSelect.bind(this)}>
+          <sl-menu-item value="settings">
+            <sl-icon slot="prefix" name="gear"></sl-icon>
+            Settings
+          </sl-menu-item>
+          <sl-menu-item value="logout">
+            <sl-icon slot="prefix" name="box-arrow-left"></sl-icon>
+            Log out
+          </sl-menu-item>
         </sl-menu>
       </sl-dropdown>
     </header>
@@ -102,6 +108,11 @@ export class CheckinHomeElement extends CheckinElement {
       <a href="https://github.com/social-web-foundation/checkin/">GitHub</a>
     </footer>
     `
+  }
+
+  _menuSelect(event) {
+    const value = event.detail.item.value
+    window.location.hash = value
   }
 
   _logout () {
