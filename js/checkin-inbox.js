@@ -112,10 +112,6 @@ export class CheckinInboxElement extends CheckinElement {
   isGeo (object) {
     return ['Arrive', 'Leave', 'Travel'].includes(object.type)
   }
-
-  _startCheckin () {
-    window.location.hash = "#checkin"
-  }
 }
 
 customElements.define('checkin-inbox', CheckinInboxElement)
