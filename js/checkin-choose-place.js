@@ -6,7 +6,7 @@ import {
 
 import { CheckinElement } from './checkin-element.js'
 
-export class CheckinMainElement extends CheckinElement {
+export class CheckinChoosePlaceElement extends CheckinElement {
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
@@ -24,11 +24,35 @@ export class CheckinMainElement extends CheckinElement {
 
   connectedCallback () {
     super.connectedCallback()
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude } = position.coords
-      this._lat = latitude
-      this._lon = longitude
+    this.getPosition()
+      .then((pos) => {
+        const { latitude, longitude } = position.coords
+        this._lat = latitude
+        this._lon = longitude
+        this.getPlaces(latitude, longitude)
+          .then((places) => {
+            this._places = places
+          })
+          .catch(err => {
+            this._error = err.message
+          })
+      })
+      .catch(err => {
+        this._error = err.message
+      })
+  }
 
+  getPosition() {
+    return new Promise((resolve, reject) => {
+      try {
+        navigator.geolocation.getCurrentPosition(resolve)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  async getPlaces(latitude, longitude) {
       const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
         latitude,
         longitude,
@@ -36,16 +60,15 @@ export class CheckinMainElement extends CheckinElement {
       )
 
       const res = await fetch(
-        `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
-      )
+       `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
+     )
 
-      if (!res.ok) {
+     if (!res.ok) {
         throw new Error('Failed to fetch nearby places.')
       }
 
       const collection = await res.json()
-      this._places = collection.items.filter((p) => p.name)
-    })
+      return collection.items.filter((p) => p.name)
   }
 
   bbox (lat, lon, distance) {
@@ -74,17 +97,9 @@ export class CheckinMainElement extends CheckinElement {
   }
 
   render () {
-    return html`
-      <nav class="navbar">
-        <span class="app-title">Checkin</span>
-        <sl-button
-          id="logout-btn"
-          variant="danger"
-          size="small"
-          @click=${this._logout}
-          >Logout</sl-button
-        >
-      </nav>
+    return (this._error)
+      ? html`<sl-alert>${this._error}</sl-alert>`
+      : html`
       <div class="location-container">
         ${this._places
           ? html`<div id="places-list" style="margin-top: 1em;">
@@ -129,16 +144,11 @@ export class CheckinMainElement extends CheckinElement {
     activity = await this.doActivity(activity)
 
     // Go to the inbox
-    const next = document.createElement('checkin-inbox')
-    next.setAttribute('redirect-uri', this.redirectUri)
-    next.setAttribute('client-id', this.cliendId)
-    this.replaceWith(next)
-  }
-
-  _logout () {
-    sessionStorage.clear()
-    window.location = this.redirectUri
+    window.location.hash = ""
   }
 }
 
-customElements.define('checkin-main', CheckinMainElement)
+customElements.define(
+  'checkin-choose-place',
+  CheckinChoosePlaceElement
+)

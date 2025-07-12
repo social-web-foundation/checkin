@@ -5,7 +5,6 @@ import {
 } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 
 import { CheckinElement } from './checkin-element.js'
-import { CheckinActivityElement } from './checkin-activity.js'
 
 export class CheckinInboxElement extends CheckinElement {
   MAX_ACTIVITIES = 20
@@ -99,10 +98,7 @@ export class CheckinInboxElement extends CheckinElement {
   }
 
   _startCheckin () {
-    const next = document.createElement('checkin-main')
-    next.setAttribute('redirect-uri', this.redirectUri)
-    next.setAttribute('client-id', this.cliendId)
-    this.replaceWith(next)
+    window.location.hash = "#checkin"
   }
 }
 
