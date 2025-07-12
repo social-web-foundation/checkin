@@ -37,7 +37,8 @@ export class CheckinHomeElement extends CheckinElement {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
       _route: { type: String, state: true },
-      _error: { type: String, state: true }
+      _error: { type: String, state: true },
+      _actor: { type: Object, state: true }
     }
   }
 
@@ -48,7 +49,13 @@ export class CheckinHomeElement extends CheckinElement {
 
   connectedCallback () {
     super.connectedCallback()
-
+    this.getActor()
+      .then((actor) => {
+        this._actor = actor
+      })
+      .catch((err) => {
+        this._error = err.message
+      })
     window.addEventListener('popstate', () => {
       const route = (window.location.hash)
         ? window.location.hash.replace('#', '')
@@ -74,7 +81,7 @@ export class CheckinHomeElement extends CheckinElement {
 
       <!-- User menu dropdown -->
       <sl-dropdown>
-        <sl-button slot="trigger" caret>Username</sl-button>
+        <sl-button slot="trigger" caret>${(this._actor) ? this._actor.name : "User"}</sl-button>
         <sl-menu>
           <sl-menu-item href="#settings">Settings</sl-menu-item>
           <sl-menu-item href="#logout">Log out</sl-menu-item>
