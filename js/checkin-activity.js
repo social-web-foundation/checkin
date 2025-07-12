@@ -1,18 +1,17 @@
-import { html, css, LitElement, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js';
+import { html, css, LitElement, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js'
 
-import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.2.3/+esm';
+import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.2.3/+esm'
 
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinActivityElement extends CheckinElement {
-
   static styles = css`
     .checkin-activity {
       border: 1px
     }
   `
 
-  static get properties() {
+  static get properties () {
     return {
       activity: { type: Object },
       _error: { type: String, state: true },
@@ -20,14 +19,14 @@ export class CheckinActivityElement extends CheckinElement {
       _location: { type: Object, state: true },
       _target: { type: Object, state: true },
       _origin: { type: Object, state: true }
-    };
+    }
   }
 
-  constructor() {
-    super();
+  constructor () {
+    super()
   }
 
-  render() {
+  render () {
     return html`
       <div class="checkin-activity">
       <p>
@@ -47,4 +46,4 @@ export class CheckinActivityElement extends CheckinElement {
   }
 }
 
-customElements.define("checkin-activity", CheckinActivityElement);
+customElements.define('checkin-activity', CheckinActivityElement)
