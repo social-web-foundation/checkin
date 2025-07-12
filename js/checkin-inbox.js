@@ -35,17 +35,19 @@ export class CheckinInboxElement extends CheckinElement {
   }
 
   render () {
-    return (this._activities)
-      ? html`
-    <sl-button @click=${this._startCheckin.bind(this)}>Checkin</sl-button>
-    <div class="inbox-activities">
-    ${this._activities.map(a =>
-      html`<checkin-activity .activity=${a}></checkin-activity>`
-      )
-    }
-    </div>
-    `
-      : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
+    return (this._error)
+      ? html`<sl-alert>${this._error}</sl-alert>`
+      : (this._activities)
+        ? html`
+      <sl-button @click=${this._startCheckin.bind(this)}>Checkin</sl-button>
+      <div class="inbox-activities">
+      ${this._activities.map(a =>
+        html`<checkin-activity .activity=${a}></checkin-activity>`
+        )
+      }
+      </div>
+      `
+        : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
   }
 
   async getActivities () {
