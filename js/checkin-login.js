@@ -8,6 +8,8 @@ import { CheckinElement } from './checkin-element.js'
 
 export class CheckinLoginElement extends LitElement {
 
+  static WEBFINGER_REGEXP = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
+
   static styles = css`
     :host {
       display: flex;
@@ -76,6 +78,10 @@ export class CheckinLoginElement extends LitElement {
         >
           Log In
         </sl-button>
+        ${(this._error)
+            ? html`<sl-alert>${this._error}</sl-alert>`
+            : html``
+        }
       </div>
     `;
   }
@@ -85,11 +91,12 @@ export class CheckinLoginElement extends LitElement {
   }
 
   isWebfinger(str) {
-    return /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/.test(str)
+    return this.WEBFINGER_REGEXP.test(str)
   }
 
   async getActorId (id) {
-    if (!this.isWebfinger(id)) {
+    const m = this.WEBFINGER_REGEXP.exec(id)
+    if (!m) {
       throw new Error('bad Webfinger format')
     }
     const username = m.groups.username
