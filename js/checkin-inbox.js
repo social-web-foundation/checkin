@@ -97,7 +97,11 @@ export class CheckinInboxElement extends CheckinElement {
       if (activities.length >= this.MAX_ACTIVITIES) {
         break
       }
-      if ((new Date(activity.published)).getTime() <= Date.now() - this.MAX_TIME_WINDOW) {
+      const timestamp = (activity.updated)
+        ? activity.updated
+        : activity.published
+
+      if (new Date(timestamp).getTime() <= Date.now() - this.MAX_TIME_WINDOW) {
         break
       }
     }
