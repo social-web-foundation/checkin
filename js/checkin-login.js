@@ -7,10 +7,43 @@ import {
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinLoginElement extends LitElement {
+
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+      background: var(--bg-main, #fafafa);
+    }
+    .intro {
+      font-size: 1.25rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      max-width: 30ch;
+    }
+    .login-form {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    sl-input {
+      flex: 1;
+      --sl-input-width: 15rem;
+    }
+    sl-button {
+      white-space: nowrap;
+    }
+  `;
+
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
+      _webfinger: { type: String, state: true },
       _error: { type: String, state: true }
     }
   }
@@ -23,43 +56,42 @@ export class CheckinLoginElement extends LitElement {
     super.connectedCallback()
   }
 
-  render () {
+  render() {
     return html`
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <h1
-          style="margin-bottom: 1.5em; font-size: 2.2em; font-weight: 700; color: #222; letter-spacing: 0.02em;"
+      <h1>Checkin</h1>
+      <p class="intro">
+        Welcome! This is an <a href="https://activitypub.rocks/">ActivityPub</a>
+        geosocial Web application. To log in, you need to have an account on a compatible server.
+      </p>
+      <div class="login-form">
+        <sl-input
+          placeholder="username@example.com"
+          .value=${this._webfinger}
+          @input=${this._input}
+        ></sl-input>
+        <sl-button
+          variant="primary"
+          ?disabled=${!this.isWebfinger(this._webfinger)}
+          @click=${this._login}
         >
-          Checkin
-        </h1>
-        <div
-          id="error-container"
-          style="width: 100%; max-width: 60ch; margin-bottom: 1em;"
-        >
-          ${this._error}
-        </div>
-        <div class="login-container">
-          <sl-input
-            id="webfinger"
-            label="Webfinger ID"
-            placeholder="user@example.com"
-            style="flex:1;"
-          ></sl-input>
-          <sl-button
-            @click=${this._login}
-            id="login-btn"
-            variant="primary">
-            Login
-          </sl-button>
-        </div>
+          Log In
+        </sl-button>
       </div>
-    `
+    `;
   }
 
-  async getActorId (id) {
+  _input(e) {
+    this._webfinger = e.target.value;
+  }
+
+  isWebfinger(str) {
     const re =
       /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
     const m = re.exec(id)
-    if (!m) {
+  }
+
+  async getActorId (id) {
+    if (!this.isWebfinger(id)) {
       throw new Error('bad Webfinger format')
     }
     const username = m.groups.username
