@@ -131,7 +131,7 @@ export class CheckinActivityElement extends CheckinElement {
         </div>
 
         <div slot="footer" class="card-footer">
-          <sl-relative-time datetime="${this.activity.published}"></sl-relative-time>
+          <sl-relative-time sync date="${this.activity.published}"></sl-relative-time>
         </div>
       </sl-card>
     `
