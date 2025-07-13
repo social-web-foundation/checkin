@@ -147,19 +147,31 @@ export class CheckinElement extends LitElement {
   async toObject (item, options = {}) {
     const { noCache } = options
     const id = await this.toId(item)
+    let json
     if (!noCache) {
-      const json = sessionStorage.getItem(`cache:${id}`)
-      if (json) {
+      const cached = sessionStorage.getItem(`cache:${id}`)
+      if (cached) {
         try {
-          const obj = JSON.parse(json)
-          return obj
+          const json = JSON.parse(cached)
+          return json
         } catch (err) {
+          sessionStorage.removeItem(`cache:${id}`)
           console.error(err)
         }
       }
     }
-    const res = await this.apFetch(id)
-    const json = await res.json()
+    try {
+      const res = await this.apFetch(id)
+      json = await res.json()
+    } catch (err) {
+      json = (typeof item == 'string')
+        ? {id: item}
+        : (typeof item == 'object' && Array.isArray(item) && item.length > 0)
+          ? item[0]
+          : (typeof item == 'object')
+            ? item
+            : null
+    }
     if (!noCache) {
       sessionStorage.setItem(`cache:${id}`, JSON.stringify(json))
     }
