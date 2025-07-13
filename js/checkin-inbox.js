@@ -20,14 +20,15 @@ export class CheckinInboxElement extends CheckinElement {
   `
 
   MAX_ACTIVITIES = 20
-  MAX_TIME_WINDOW = 3 * 24 * 60 * 60 * 1000 // three days
+  MAX_TIME_WINDOW = 30 * 24 * 60 * 60 * 1000 // thirty days
 
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
       _error: { type: String, state: true },
-      _activities: { type: Array, state: true }
+      _activities: { type: Array, state: true, default: [] },
+      _isLoading: { type: Boolean, state: true, default: false }
     }
   }
 
@@ -46,16 +47,20 @@ export class CheckinInboxElement extends CheckinElement {
     return (this._error)
       ? html`<sl-alert>${this._error}</sl-alert>`
       : html`
-          <h2>Latest activities</h2>
+          <h2>Latest activities
+          ${
+            (this._isLoading)
+            ? html`<sl-spinner></sl-spinner>`
+            : html``
+          }
+          </h2>
           <div class="inbox-activities">
-          ${(this._activities)
+          ${(this._activities && this._activities.length > 0)
             ? this._activities.map(a =>
                 html`<checkin-activity .activity=${a}></checkin-activity>`
               )
             : html`
-              <div class="spinner-container">
-                <sl-spinner class="half-spinner"></sl-spinner>
-              </div>
+              <div><p>No activities.</p></div>
               `
           }
           </div>
@@ -63,10 +68,17 @@ export class CheckinInboxElement extends CheckinElement {
   }
 
   async _loadActivities () {
+    this._isLoading = true
     const activitiesJSON = sessionStorage.getItem('inbox-activities')
     const cached = (activitiesJSON)
       ? JSON.parse(activitiesJSON)
       : []
+
+    if (cached.length > 0) {
+      this._activities = [
+        ...cached
+      ].slice(0, this.MAX_ACTIVITIES)
+    }
 
     let inbox = sessionStorage.getItem('inbox')
     if (!inbox) {
@@ -88,7 +100,6 @@ export class CheckinInboxElement extends CheckinElement {
       }
       if (this.isGeo(activity)) {
         activities.push(activity)
-        // Updates
         this._activities = [
           ...activities,
           ...cached
@@ -109,6 +120,8 @@ export class CheckinInboxElement extends CheckinElement {
     if (this._activities) {
       sessionStorage.setItem('inbox-activities', JSON.stringify(this._activities))
     }
+
+    this._isLoading = false
   }
 
   isGeo (object) {
