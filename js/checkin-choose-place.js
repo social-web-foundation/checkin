@@ -53,7 +53,6 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   }
 
   async getPlaces (latitude, longitude) {
-
     const cached = sessionStorage.getItem(`places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`)
 
     if (cached) {

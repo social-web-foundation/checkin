@@ -164,13 +164,13 @@ export class CheckinElement extends LitElement {
       const res = await this.apFetch(id)
       json = await res.json()
     } catch (err) {
-      json = (typeof item == 'string')
-        ? {id: item}
-        : (typeof item == 'object' && Array.isArray(item) && item.length > 0)
-          ? item[0]
-          : (typeof item == 'object')
-            ? item
-            : null
+      json = (typeof item === 'string')
+        ? { id: item }
+        : (typeof item === 'object' && Array.isArray(item) && item.length > 0)
+            ? item[0]
+            : (typeof item === 'object')
+                ? item
+                : null
     }
     if (!noCache) {
       sessionStorage.setItem(`cache:${id}`, JSON.stringify(json))

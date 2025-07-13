@@ -9,7 +9,7 @@ import { CheckinChoosePlaceElement } from './checkin-choose-place.js'
 import { CheckinInboxElement } from './checkin-inbox.js'
 
 export class CheckinHomeElement extends CheckinElement {
-    static styles = css`
+  static styles = css`
     :host {
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -30,7 +30,7 @@ export class CheckinHomeElement extends CheckinElement {
       align-items: center;
       justify-content: space-between;
     }
-  `;
+  `
 
   static get properties () {
     return {
@@ -81,7 +81,7 @@ export class CheckinHomeElement extends CheckinElement {
 
       <!-- User menu dropdown -->
       <sl-dropdown>
-        <sl-button slot="trigger" caret>${(this._actor) ? this._actor.name : "User"}</sl-button>
+        <sl-button slot="trigger" caret>${(this._actor) ? this._actor.name : 'User'}</sl-button>
         <sl-menu @sl-select=${this._menuSelect.bind(this)}>
           <sl-menu-item value="settings">
             <sl-icon slot="prefix" name="gear"></sl-icon>
@@ -110,7 +110,7 @@ export class CheckinHomeElement extends CheckinElement {
     `
   }
 
-  _menuSelect(event) {
+  _menuSelect (event) {
     const value = event.detail.item.value
     window.location.hash = value
   }

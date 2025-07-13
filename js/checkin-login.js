@@ -7,7 +7,6 @@ import {
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinLoginElement extends LitElement {
-
   WEBFINGER_REGEXP = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
 
   static styles = css`
@@ -39,7 +38,7 @@ export class CheckinLoginElement extends LitElement {
     sl-button {
       white-space: nowrap;
     }
-  `;
+  `
 
   static get properties () {
     return {
@@ -58,7 +57,7 @@ export class CheckinLoginElement extends LitElement {
     super.connectedCallback()
   }
 
-  render() {
+  render () {
     return html`
       <h1>Checkin</h1>
       <p class="intro">
@@ -83,14 +82,14 @@ export class CheckinLoginElement extends LitElement {
             : html``
         }
       </div>
-    `;
+    `
   }
 
-  _input(e) {
-    this._webfinger = e.target.value;
+  _input (e) {
+    this._webfinger = e.target.value
   }
 
-  isWebfinger(str) {
+  isWebfinger (str) {
     return this.WEBFINGER_REGEXP.test(str)
   }
 
