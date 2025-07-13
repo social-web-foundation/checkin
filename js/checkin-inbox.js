@@ -37,7 +37,9 @@ export class CheckinInboxElement extends CheckinElement {
 
   connectedCallback () {
     super.connectedCallback()
-    this._loadActivities()
+    this._loadActivities().then(() => {
+      console.log("Activities loaded")
+    })
   }
 
   render () {
