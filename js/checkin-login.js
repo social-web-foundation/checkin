@@ -65,8 +65,8 @@ export class CheckinLoginElement extends LitElement {
       </p>
       <div class="login-form">
         <sl-input
+          id="webfinger"
           placeholder="username@example.com"
-          .value=${this._webfinger}
           @input=${this._input}
         ></sl-input>
         <sl-button
