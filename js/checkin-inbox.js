@@ -80,6 +80,7 @@ export class CheckinInboxElement extends CheckinElement {
     const activities = []
 
     for await (const activity of this.items(inbox)) {
+      console.dir({id: activity.id, published: activity.published})
       if (latestId && activity.id === latestId) {
         break
       }
