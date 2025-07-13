@@ -27,7 +27,7 @@ export class CheckinInboxElement extends CheckinElement {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
       _error: { type: String, state: true },
-      _activities: { type: Array, state: true, default: [] }
+      _activities: { type: Array, state: true }
     }
   }
 
@@ -37,12 +37,7 @@ export class CheckinInboxElement extends CheckinElement {
 
   connectedCallback () {
     super.connectedCallback()
-    this
-      .getActivities()
-      .then((activities) => {
-        this._activities = activities
-      })
-      .catch((err) => this._error = err.message)
+    this._loadActivities()
   }
 
   render () {
@@ -65,7 +60,7 @@ export class CheckinInboxElement extends CheckinElement {
           `
   }
 
-  async getActivities () {
+  async _loadActivities () {
     const activitiesJSON = sessionStorage.getItem('inbox-activities')
     const cached = (activitiesJSON)
       ? JSON.parse(activitiesJSON)
@@ -90,6 +85,11 @@ export class CheckinInboxElement extends CheckinElement {
       }
       if (this.isGeo(activity)) {
         activities.push(activity)
+        // Updates
+        this._activities = [
+          ...activities,
+          ...cached
+        ].slice(0, this.MAX_ACTIVITIES)
       }
       if (activities.length >= this.MAX_ACTIVITIES) {
         break
@@ -99,13 +99,7 @@ export class CheckinInboxElement extends CheckinElement {
       }
     }
 
-    const result = activities
-      .concat(cached)
-      .slice(0, this.MAX_ACTIVITIES)
-
-    sessionStorage.setItem('inbox-activities', JSON.stringify(result))
-
-    return result
+    sessionStorage.setItem('inbox-activities', JSON.stringify(this._activities))
   }
 
   isGeo (object) {
