@@ -102,7 +102,9 @@ export class CheckinInboxElement extends CheckinElement {
       }
     }
 
-    sessionStorage.setItem('inbox-activities', JSON.stringify(this._activities))
+    if (this._activities) {
+      sessionStorage.setItem('inbox-activities', JSON.stringify(this._activities))
+    }
   }
 
   isGeo (object) {
