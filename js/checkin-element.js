@@ -178,25 +178,39 @@ export class CheckinElement extends LitElement {
     return json
   }
 
-  getUrl (object) {
+  getIcon (object) {
+    return this.getUrl(object,
+      {
+        prop: 'icon',
+        types: ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp', 'image/avif', 'image/vnd.microsoft.icon']
+      }
+    )
+  }
+
+  getUrl (object, options = {prop: 'url', types: ['text/html']}) {
+    const { prop, types } = options
     if (!object) return null
     if (!(typeof object) == 'object') return null
-    if (!(object.url)) return null
-    switch (typeof object.url) {
+    if (!(object[prop])) return null
+    switch (typeof object[prop]) {
       case 'string':
-        return object.url
+        return object[prop]
       case 'object':
-        if (Array.isArray(object.url)) {
-          const htmlLink = object.url.find(l => typeof l === 'object' && l.mediaType && l.mediaType.startsWith('text/html'))
-          if (htmlLink) {
-            return htmlLink.href
-          } else if (object.url.length > 0) {
-            return object.url[0].href
+        if (Array.isArray(object[prop])) {
+          const linkMatch = object[prop].find((l) =>
+            typeof l === 'object'
+            && l.type === 'Link'
+            && l.mediaType
+            && types.some(t => l.mediaType.startsWith(t)))
+          if (linkMatch) {
+            return linkMatch.href
+          } else if (object[prop].length > 0) {
+            return object[prop][0].href
           } else {
             return null
           }
         } else {
-          return object.url.href
+          return object[prop].href
         }
         break
     }

@@ -86,25 +86,25 @@ export class CheckinActivityElement extends CheckinElement {
 
   async _loadActor() {
     if (this.activity.actor) {
-      this._actor = await this.getObject(this.activity.actor)
+      this._actor = await this.toObject(this.activity.actor)
     }
   }
 
   async _loadLocation() {
     if (this.activity.location) {
-      this._location = await this.getObject(this.activity.location)
+      this._location = await this.toObject(this.activity.location)
     }
   }
 
   async _loadTarget() {
     if (this.activity.target) {
-      this._target = await this.getObject(this.activity.target)
+      this._target = await this.toObject(this.activity.target)
     }
   }
 
   async _loadOrigin() {
     if (this.activity.origin) {
-      this._origin = await this.getObject(this.activity.origin)
+      this._origin = await this.toObject(this.activity.origin)
     }
   }
 
