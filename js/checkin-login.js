@@ -8,7 +8,7 @@ import { CheckinElement } from './checkin-element.js'
 
 export class CheckinLoginElement extends LitElement {
 
-  static WEBFINGER_REGEXP = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
+  WEBFINGER_REGEXP = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
 
   static styles = css`
     :host {
