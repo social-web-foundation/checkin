@@ -62,7 +62,7 @@ export class CheckinActivityElement extends CheckinElement {
   }
 
   constructor() {
-    super.constructor(this)
+    super.constructor()
     this._actor = this.activity?.actor
     this._location = this.activity._location
     this._target = this.activity._target
