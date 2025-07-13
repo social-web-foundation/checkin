@@ -63,15 +63,17 @@ export class CheckinActivityElement extends CheckinElement {
 
   constructor() {
     super()
-    this._actor = this.activity?.actor
-    this._location = this.activity._location
-    this._target = this.activity._target
-    this._origin = this.activity._origin
   }
 
 
   connectedCallback () {
     super.connectedCallback()
+    // Initialize with values from activity
+    this._actor = this.activity?.actor
+    this._location = this.activity?.location
+    this._target = this.activity?.target
+    this._origin = this.activity?.origin
+    // Load in the background
     Promise.all([
       this._loadActor(),
       this._loadLocation(),
