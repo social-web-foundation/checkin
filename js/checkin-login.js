@@ -7,7 +7,8 @@ import {
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinLoginElement extends LitElement {
-  WEBFINGER_REGEXP = /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
+  WEBFINGER_REGEXP =
+    /^(?:acct:)?(?<username>[^@]+)@(?<domain>(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*)$/
 
   static styles = css`
     :host {
@@ -62,7 +63,8 @@ export class CheckinLoginElement extends LitElement {
       <h1>Checkin</h1>
       <p class="intro">
         Welcome! This is an <a href="https://activitypub.rocks/">ActivityPub</a>
-        geosocial Web application. To log in, you need to have an account on a compatible server.
+        geosocial Web application. To log in, you need to have an account on a
+        compatible server.
       </p>
       <div class="login-form">
         <sl-input
@@ -77,10 +79,7 @@ export class CheckinLoginElement extends LitElement {
         >
           Log In
         </sl-button>
-        ${(this._error)
-            ? html`<sl-alert>${this._error}</sl-alert>`
-            : html``
-        }
+        ${this._error ? html`<sl-alert>${this._error}</sl-alert>` : html``}
       </div>
     `
   }
@@ -101,13 +100,11 @@ export class CheckinLoginElement extends LitElement {
     const username = m.groups.username
     const domain = m.groups.domain
     const wfUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}%40${domain}`
-    const res = await fetch(wfUrl,
-      {
-        headers: {
-          Accept: 'application/jrd+json,application/json'
-        }
+    const res = await fetch(wfUrl, {
+      headers: {
+        Accept: 'application/jrd+json,application/json'
       }
-    )
+    })
     if (!res.ok) {
       throw new Error('Could not load webfinger')
     }
@@ -130,11 +127,12 @@ export class CheckinLoginElement extends LitElement {
   }
 
   async getActor (actorId) {
-    const res = await fetch(actorId,
-      {
-        Accept: 'application/activity+json,application/lrd+json,application/json'
+    const res = await fetch(actorId, {
+      headers: {
+        Accept:
+          'application/activity+json,application/lrd+json,application/json'
       }
-    )
+    })
     if (!res.ok) {
       throw new Error('Failure fetching actor')
     }
