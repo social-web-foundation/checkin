@@ -108,27 +108,37 @@ export class CheckinElement extends LitElement {
     }
   }
 
+  async _getAllItems (arr) {
+    return await Promise.all(
+      arr.map(i => this.toObject(i, { required: ['id', 'type', 'published'] }))
+    )
+  }
+
   async * items (coll) {
     const collection = await this.toObject(coll, { noCache: true })
     if (collection.items) {
-      for (const item of collection.items) {
-        yield await this.toObject(item)
+      const objects = await this._getAllItems(collection.items)
+      for (const object of objects) {
+        yield object
       }
     } else if (collection.orderedItems) {
-      for (const item of collection.orderedItems) {
-        yield await this.toObject(item)
+      const objects = await this._getAllItems(collection.orderedItems)
+      for (const object of objects) {
+        yield object
       }
     } else if (collection.first) {
       let pageId = await this.toId(collection.first)
       do {
         const page = await this.toObject(pageId, { noCache: true })
         if (page.items) {
-          for (const item of page.items) {
-            yield await this.toObject(item)
+          const objects = await this._getAllItems(page.items)
+          for (const object of objects) {
+            yield object
           }
         } else if (page.orderedItems) {
-          for (const item of page.orderedItems) {
-            yield await this.toObject(item)
+          const objects = await this._getAllItems(page.orderedItems)
+          for (const object of objects) {
+            yield object
           }
         }
         pageId = await this.toId(page.next)
@@ -144,8 +154,11 @@ export class CheckinElement extends LitElement {
           : null
   }
 
-  async toObject (item, options = {}) {
-    const { noCache } = options
+  async toObject (item, options = { noCache: false, required: null }) {
+    const { noCache, required } = options
+    if (required && typeof item === 'object' && required.every(p => p in item)) {
+      return item
+    }
     const id = await this.toId(item)
     let json
     if (!noCache) {
@@ -187,7 +200,7 @@ export class CheckinElement extends LitElement {
     )
   }
 
-  getUrl (object, options = {prop: 'url', types: ['text/html']}) {
+  getUrl (object, options = { prop: 'url', types: ['text/html'] }) {
     const { prop, types } = options
     if (!object) return null
     if (!(typeof object) == 'object') return null
@@ -198,10 +211,10 @@ export class CheckinElement extends LitElement {
       case 'object':
         if (Array.isArray(object[prop])) {
           const linkMatch = object[prop].find((l) =>
-            typeof l === 'object'
-            && l.type === 'Link'
-            && l.mediaType
-            && types.some(t => l.mediaType.startsWith(t)))
+            typeof l === 'object' &&
+            l.type === 'Link' &&
+            l.mediaType &&
+            types.some(t => l.mediaType.startsWith(t)))
           if (linkMatch) {
             return linkMatch.href
           } else if (object[prop].length > 0) {

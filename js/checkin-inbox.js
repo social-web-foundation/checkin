@@ -167,7 +167,7 @@ export class CheckinInboxElement extends CheckinElement {
     const activities = []
 
     for await (const activity of this.items(inbox)) {
-      console.dir({ id: activity.id, published: activity.published })
+      console.dir({ id: activity.id, type: activity.type, published: activity.published })
       if (!isActivity(activity)) {
         continue
       }
@@ -175,7 +175,15 @@ export class CheckinInboxElement extends CheckinElement {
         break
       }
       if (this.isGeo(activity)) {
-        activities.push(activity)
+        const required = ['id', 'type', 'published', 'actor'].concat(
+          (activity.type == 'Arrive')
+            ? ['location']
+            : (activity.type == 'Leave')
+              ? ['object']
+              : (activity.type == 'Travel')
+                ? ['target', 'origin']
+                : [])
+        activities.push(await this.toObject(activity, {required: required}))
         this._activities = [...activities, ...cached].slice(
           0,
           this.MAX_ACTIVITIES
