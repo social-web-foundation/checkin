@@ -29,6 +29,8 @@ export class CheckinHomeElement extends CheckinElement {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background-color: var(--bg-header);
+      color: var(--sl-color-neutral-100);
     }
   `
 
