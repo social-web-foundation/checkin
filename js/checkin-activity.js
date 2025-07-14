@@ -24,7 +24,6 @@ export class CheckinActivityElement extends CheckinElement {
       align-items: center;
       gap: 0.5rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--sl-color-neutral-200);
     }
 
     .card-body {
@@ -37,7 +36,6 @@ export class CheckinActivityElement extends CheckinElement {
       color: var(--sl-color-neutral-600);
       text-align: right;
       padding-top: 0.5rem;
-      border-top: 1px solid var(--sl-color-neutral-200);
     }
 
     sl-avatar {
