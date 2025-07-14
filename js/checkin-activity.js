@@ -61,10 +61,9 @@ export class CheckinActivityElement extends CheckinElement {
     }
   }
 
-  constructor() {
+  constructor () {
     super()
   }
-
 
   connectedCallback () {
     super.connectedCallback()
@@ -80,36 +79,35 @@ export class CheckinActivityElement extends CheckinElement {
       this._loadTarget(),
       this._loadOrigin()
     ]).then(() => {
-      console.log("Parts loaded")
+      console.log('Parts loaded')
     })
   }
 
-  async _loadActor() {
+  async _loadActor () {
     if (this.activity.actor) {
       this._actor = await this.toObject(this.activity.actor)
     }
   }
 
-  async _loadLocation() {
+  async _loadLocation () {
     if (this.activity.location) {
       this._location = await this.toObject(this.activity.location)
     }
   }
 
-  async _loadTarget() {
+  async _loadTarget () {
     if (this.activity.target) {
       this._target = await this.toObject(this.activity.target)
     }
   }
 
-  async _loadOrigin() {
+  async _loadOrigin () {
     if (this.activity.origin) {
       this._origin = await this.toObject(this.activity.origin)
     }
   }
 
   render () {
-
     return html`
       <sl-card>
         <div slot="header" class="card-header">
