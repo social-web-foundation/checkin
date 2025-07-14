@@ -179,11 +179,11 @@ export class CheckinInboxElement extends CheckinElement {
           (activity.type == 'Arrive')
             ? ['location']
             : (activity.type == 'Leave')
-              ? ['object']
-              : (activity.type == 'Travel')
-                ? ['target', 'origin']
-                : [])
-        activities.push(await this.toObject(activity, {required: required}))
+                ? ['object']
+                : (activity.type == 'Travel')
+                    ? ['target', 'origin']
+                    : [])
+        activities.push(await this.toObject(activity, { required }))
         this._activities = [...activities, ...cached].slice(
           0,
           this.MAX_ACTIVITIES
