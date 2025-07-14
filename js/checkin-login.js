@@ -86,6 +86,7 @@ export class CheckinLoginElement extends LitElement {
 
   _input (e) {
     this._webfinger = e.target.value
+    this._error = null
   }
 
   isWebfinger (str) {
