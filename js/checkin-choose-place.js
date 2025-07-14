@@ -1,4 +1,8 @@
-import { html, css, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
+import {
+  html,
+  css,
+  LitElement
+} from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinChoosePlaceElement extends CheckinElement {
@@ -48,15 +52,15 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   connectedCallback () {
     super.connectedCallback()
     this.getPosition()
-      .then(pos => {
+      .then((pos) => {
         this._lat = Number(pos.coords.latitude.toFixed(5))
         this._lon = Number(pos.coords.longitude.toFixed(5))
         return this.getPlaces(pos.coords.latitude, pos.coords.longitude)
       })
-      .then(places => {
+      .then((places) => {
         this._places = places
       })
-      .catch(err => {
+      .catch((err) => {
         this._error = err.message
       })
   }
@@ -85,7 +89,13 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     )
 
     const res = await fetch(
-      `https://places.pub/search?bbox=${minLon},${minLat},${maxLon},${maxLat}`
+      `https://places.pub/search?bbox=${minLon},${minLat},${maxLon},${maxLat}`,
+      {
+        headers: {
+          Accept:
+            'application/activity+json,application/lrd+json,application/json'
+        }
+      }
     )
 
     if (!res.ok) {
@@ -93,7 +103,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     }
 
     const collection = await res.json()
-    const places = collection.items.filter(p => p.name)
+    const places = collection.items.filter((p) => p.name)
     sessionStorage.setItem(key, JSON.stringify(places))
     return places
   }
@@ -144,7 +154,10 @@ export class CheckinChoosePlaceElement extends CheckinElement {
                 @sl-change=${this._onPlaceChange}
               >
                 ${this._places.map(
-                  place => html`<sl-option value="${place.id}">${place.name}</sl-option>`
+                  (place) =>
+                    html`<sl-option value="${place.id}"
+                      >${place.name}</sl-option
+                    >`
                 )}
               </sl-select>
             </div>
@@ -181,7 +194,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   }
 
   async _submitCheckin () {
-    const place = this._places.find(p => p.id === this._selectedPlace)
+    const place = this._places.find((p) => p.id === this._selectedPlace)
     if (!place) return
 
     const actor = await this.getActor()
@@ -197,7 +210,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
         name: place.name,
         url: place.url
       },
-      content: this._note || undefined,
+      content: this._note || undefined
     }
 
     const followers = await this.toId(actor.followers)
@@ -218,7 +231,4 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   }
 }
 
-customElements.define(
-  'checkin-choose-place',
-  CheckinChoosePlaceElement
-)
+customElements.define('checkin-choose-place', CheckinChoosePlaceElement)

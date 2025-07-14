@@ -101,7 +101,13 @@ export class CheckinLoginElement extends LitElement {
     const username = m.groups.username
     const domain = m.groups.domain
     const wfUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}%40${domain}`
-    const res = await fetch(wfUrl)
+    const res = await fetch(wfUrl,
+      {
+        headers: {
+          Accept: 'application/jrd+json,application/json'
+        }
+      }
+    )
     if (!res.ok) {
       throw new Error('Could not load webfinger')
     }
@@ -124,7 +130,11 @@ export class CheckinLoginElement extends LitElement {
   }
 
   async getActor (actorId) {
-    const res = await fetch(actorId)
+    const res = await fetch(actorId,
+      {
+        Accept: 'application/activity+json,application/lrd+json,application/json'
+      }
+    )
     if (!res.ok) {
       throw new Error('Failure fetching actor')
     }

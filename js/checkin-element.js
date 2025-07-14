@@ -1,4 +1,9 @@
-import { html, css, LitElement, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js'
+import {
+  html,
+  css,
+  LitElement,
+  unsafeHTML
+} from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js'
 
 export class CheckinElement extends LitElement {
   static get properties () {
@@ -98,7 +103,12 @@ export class CheckinElement extends LitElement {
       return JSON.parse(actorJSON)
     } else {
       const actorId = sessionStorage.getItem('actor_id')
-      const res = await this.apFetch(actorId)
+      const res = await this.apFetch(actorId, {
+        headers: {
+          Accept:
+            'application/activity+json,application/lrd+json,application/json'
+        }
+      })
       if (!res.ok) {
         throw new Error('Failure fetching actor')
       }
@@ -110,7 +120,9 @@ export class CheckinElement extends LitElement {
 
   async _getAllItems (arr) {
     return await Promise.all(
-      arr.map(i => this.toObject(i, { required: ['id', 'type', 'published'] }))
+      arr.map((i) =>
+        this.toObject(i, { required: ['id', 'type', 'published'] })
+      )
     )
   }
 
@@ -147,16 +159,20 @@ export class CheckinElement extends LitElement {
   }
 
   async toId (item) {
-    return (typeof item === 'string')
+    return typeof item === 'string'
       ? item
-      : (typeof item === 'object' && item.id && typeof item.id === 'string')
-          ? item.id
-          : null
+      : typeof item === 'object' && item.id && typeof item.id === 'string'
+        ? item.id
+        : null
   }
 
   async toObject (item, options = { noCache: false, required: null }) {
     const { noCache, required } = options
-    if (required && typeof item === 'object' && required.every(p => p in item)) {
+    if (
+      required &&
+      typeof item === 'object' &&
+      required.every((p) => p in item)
+    ) {
       return item
     }
     const id = await this.toId(item)
@@ -174,16 +190,22 @@ export class CheckinElement extends LitElement {
       }
     }
     try {
-      const res = await this.apFetch(id)
+      const res = await this.apFetch(id, {
+        headers: {
+          Accept:
+            'application/activity+json,application/lrd+json,application/json'
+        }
+      })
       json = await res.json()
     } catch (err) {
-      json = (typeof item === 'string')
-        ? { id: item }
-        : (typeof item === 'object' && Array.isArray(item) && item.length > 0)
+      json =
+        typeof item === 'string'
+          ? { id: item }
+          : typeof item === 'object' && Array.isArray(item) && item.length > 0
             ? item[0]
-            : (typeof item === 'object')
-                ? item
-                : null
+            : typeof item === 'object'
+              ? item
+              : null
     }
     if (!noCache) {
       sessionStorage.setItem(`cache:${id}`, JSON.stringify(json))
@@ -192,29 +214,37 @@ export class CheckinElement extends LitElement {
   }
 
   getIcon (object) {
-    return this.getUrl(object,
-      {
-        prop: 'icon',
-        types: ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp', 'image/avif', 'image/vnd.microsoft.icon']
-      }
-    )
+    return this.getUrl(object, {
+      prop: 'icon',
+      types: [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/svg+xml',
+        'image/webp',
+        'image/avif',
+        'image/vnd.microsoft.icon'
+      ]
+    })
   }
 
   getUrl (object, options = { prop: 'url', types: ['text/html'] }) {
     const { prop, types } = options
     if (!object) return null
-    if (!(typeof object) == 'object') return null
-    if (!(object[prop])) return null
+    if (!typeof object == 'object') return null
+    if (!object[prop]) return null
     switch (typeof object[prop]) {
       case 'string':
         return object[prop]
       case 'object':
         if (Array.isArray(object[prop])) {
-          const linkMatch = object[prop].find((l) =>
-            typeof l === 'object' &&
-            l.type === 'Link' &&
-            l.mediaType &&
-            types.some(t => l.mediaType.startsWith(t)))
+          const linkMatch = object[prop].find(
+            (l) =>
+              typeof l === 'object' &&
+              l.type === 'Link' &&
+              l.mediaType &&
+              types.some((t) => l.mediaType.startsWith(t))
+          )
           if (linkMatch) {
             return linkMatch.href
           } else if (object[prop].length > 0) {
@@ -239,20 +269,13 @@ export class CheckinElement extends LitElement {
   }
 
   contentEscape (s) {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   }
 
   makeSummaryPart (object, def = '(something)') {
-    const name = (object)
-      ? (object.name)
-          ? object.name
-          : def
-      : def
+    const name = object ? (object.name ? object.name : def) : def
     const url = this.getUrl(object)
-    return (url)
+    return url
       ? `<a href="${this.attrEscape(url)}">${this.contentEscape(name)}</a>`
       : `${this.contentEscape(name)}`
   }
@@ -261,7 +284,10 @@ export class CheckinElement extends LitElement {
     const actorPart = this.makeSummaryPart(activity.actor, '(someone)')
     switch (activity.type) {
       case 'Arrive': {
-        const placePart = this.makeSummaryPart(activity.location, '(somewhere)')
+        const placePart = this.makeSummaryPart(
+          activity.location,
+          '(somewhere)'
+        )
         return `${actorPart} arrived at ${placePart}`
         break
       }
