@@ -181,10 +181,19 @@ export class CheckinLoginElement extends LitElement {
       sessionStorage.setItem('actor_id', actorId)
       const actor = await this.getActor(actorId)
       const tokenUrl = await this.getTokenEndpoint(actor)
+      if (!tokenUrl) {
+        throw new Error(`No OAuth token endpoint.`)
+      }
       sessionStorage.setItem('oauth_token_url', tokenUrl)
       const proxyUrl = await this.getProxyUrl(actor)
+      if (!proxyUrl) {
+        throw new Error(`No Proxy endpoint.`)
+      }
       sessionStorage.setItem('proxy_url', proxyUrl)
       const authorizationUrl = await this.getAuthorizationEndpoint(actor)
+      if (!authorizationUrl) {
+        throw new Error(`No OAuth authorization endpoint.`)
+      }
       const state = crypto.randomUUID()
       sessionStorage.setItem('oauth_state', state)
       const verifier = this.generateCodeVerifier()
