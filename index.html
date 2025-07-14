@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css"
     />
@@ -15,8 +19,16 @@
       :root {
         --max-width: 75ch;
         --gap: 1rem;
+        --sl-font-sans: "Inter", system-ui, sans-serif;
+        --sl-color-primary-500: #008080;
+        --sl-color-neutral-100: #fafafa;
+        --sl-color-neutral-900: #1a1a1a;
+        --sl-color-danger-500: #d32f2f;
       }
       body {
+        font-family: var(--sl-font-sans);
+        background: var(--sl-color-neutral-100);
+        color: var(--sl-color-neutral-900);
         display: grid;
         grid-template-rows: auto 1fr auto;
         min-height: 100vh;
@@ -38,7 +50,7 @@
   <body>
     <div id="page">
       <div class="spinner-page">
-        <sl-spinner style="--size:50vw;"></sl-spinner>
+        <sl-spinner style="--size: 50vw"></sl-spinner>
       </div>
     </div>
     <script type="module">
@@ -47,13 +59,12 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);
-        document.getElementById("page").innerHTML =
-          (params.get("state"))
+        document.getElementById("page").innerHTML = params.get("state")
           ? `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`
-          : (!sessionStorage.getItem("access_token"))
-            ? `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri} />`
-            : `<checkin-home client-id=${client_id} redirect-uri=${redirect_uri} />`
-      })
+          : !sessionStorage.getItem("access_token")
+          ? `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri} />`
+          : `<checkin-home client-id=${client_id} redirect-uri=${redirect_uri} />`;
+      });
     </script>
   </body>
 </html>
