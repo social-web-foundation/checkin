@@ -1,12 +1,29 @@
-import {
-  html,
-  css,
-  LitElement
-} from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
-
+import { html, css, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 import { CheckinElement } from './checkin-element.js'
 
 export class CheckinChoosePlaceElement extends CheckinElement {
+  static styles = css`
+    :host {
+      display: block;
+      padding: var(--gap, 1rem);
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    sl-select,
+    sl-textarea,
+    sl-radio-group {
+      width: 100%;
+    }
+    sl-radio-group {
+      display: flex;
+      gap: 1rem;
+    }
+    .actions {
+      text-align: right;
+    }
+  `
+
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
@@ -14,28 +31,30 @@ export class CheckinChoosePlaceElement extends CheckinElement {
       _error: { type: String, state: true },
       _lat: { type: Number, state: true },
       _lon: { type: Number, state: true },
-      _places: { type: Array, state: true }
+      _places: { type: Array, state: true },
+      _selectedPlace: { type: String, state: true },
+      _note: { type: String, state: true },
+      _privacy: { type: String, state: true }
     }
   }
 
   constructor () {
     super()
+    this._selectedPlace = ''
+    this._note = ''
+    this._privacy = 'public'
   }
 
   connectedCallback () {
     super.connectedCallback()
     this.getPosition()
-      .then((pos) => {
-        const { latitude, longitude } = pos.coords
-        this._lat = Number(latitude.toFixed(5))
-        this._lon = Number(longitude.toFixed(5))
-        this.getPlaces(latitude, longitude)
-          .then((places) => {
-            this._places = places
-          })
-          .catch(err => {
-            this._error = err.message
-          })
+      .then(pos => {
+        this._lat = Number(pos.coords.latitude.toFixed(5))
+        this._lon = Number(pos.coords.longitude.toFixed(5))
+        return this.getPlaces(pos.coords.latitude, pos.coords.longitude)
+      })
+      .then(places => {
+        this._places = places
       })
       .catch(err => {
         this._error = err.message
@@ -53,20 +72,20 @@ export class CheckinChoosePlaceElement extends CheckinElement {
   }
 
   async getPlaces (latitude, longitude) {
-    const cached = sessionStorage.getItem(`places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`)
-
+    const key = `places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`
+    const cached = sessionStorage.getItem(key)
     if (cached) {
       return JSON.parse(cached)
     }
 
-    const [minLongitude, minLatitude, maxLongitude, maxLatitude] = this.bbox(
+    const [minLon, minLat, maxLon, maxLat] = this.bbox(
       latitude,
       longitude,
       100
     )
 
     const res = await fetch(
-       `https://places.pub/search?bbox=${minLongitude},${minLatitude},${maxLongitude},${maxLatitude}`
+      `https://places.pub/search?bbox=${minLon},${minLat},${maxLon},${maxLat}`
     )
 
     if (!res.ok) {
@@ -74,26 +93,19 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     }
 
     const collection = await res.json()
-    const places = collection.items.filter((p) => p.name)
-    sessionStorage.setItem(`places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`, JSON.stringify(places))
+    const places = collection.items.filter(p => p.name)
+    sessionStorage.setItem(key, JSON.stringify(places))
     return places
   }
 
   bbox (lat, lon, distance) {
-    const EARTH_RADIUS_M = 6_371_000
+    const EARTH_RADIUS_M = 6371000
     const degToRad = Math.PI / 180
     const radToDeg = 180 / Math.PI
 
-    // convert center latitude to radians
     const latRad = lat * degToRad
-
-    // angular distance in radians on the earth’s surface
     const radDist = distance / EARTH_RADIUS_M
-
-    // delta in degrees latitude
     const deltaLat = radDist * radToDeg
-
-    // delta in degrees longitude, corrected by latitude
     const deltaLon = (radDist * radToDeg) / Math.cos(latRad)
 
     const minLat = Number((lat - deltaLat).toFixed(5))
@@ -104,42 +116,76 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     return [minLon, minLat, maxLon, maxLat]
   }
 
+  _onPlaceChange (event) {
+    this._selectedPlace = event.target.value
+  }
+
+  _onNoteInput (event) {
+    this._note = event.target.value
+  }
+
+  _onPrivacyChange (event) {
+    this._privacy = event.target.value
+  }
+
   render () {
-    return (this._error)
-      ? html`<sl-alert>${this._error}</sl-alert>`
-      : html`
-      <h2>Nearby places</h2>
-      <div class="location-container">
-        ${this._places
-          ? html`<div id="places-list" style="margin-top: 1em;">
-              <ul>
+    if (this._error) {
+      return html`<sl-alert variant="danger">${this._error}</sl-alert>`
+    }
+    return html`
+      ${!this._places
+        ? html`<sl-spinner></sl-spinner>`
+        : html`
+            <div class="form-group">
+              <sl-select
+                label="Place"
+                placeholder="Select a place"
+                .value=${this._selectedPlace}
+                @sl-change=${this._onPlaceChange}
+              >
                 ${this._places.map(
-                  (place) =>
-                    html`<li>
-                      ${place.name}
-                      <sl-button
-                        class="checkin-button"
-                        data-place-id="${place.id}"
-                        data-place-name="${place.name}"
-                        size="small"
-                        @click=${this._checkin.bind(this)}
-                        >Checkin</sl-button
-                      >
-                    </li>`
+                  place => html`<sl-option value="${place.id}">${place.name}</sl-option>`
                 )}
-              </ul>
-            </div>`
-          : html`<sl-spinner style="font-size: 2rem;"></sl-spinner>`}
-      </div>
+              </sl-select>
+            </div>
+            <div class="form-group">
+              <sl-textarea
+                label="Note"
+                placeholder="Add a note"
+                .value=${this._note}
+                @sl-input=${this._onNoteInput}
+              ></sl-textarea>
+            </div>
+            <div class="form-group">
+              <sl-radio-group
+                label="Visibility"
+                name="visibility"
+                .value=${this._privacy}
+                @sl-change=${this._onPrivacyChange}
+              >
+                <sl-radio value="public">Public</sl-radio>
+                <sl-radio value="private">Private</sl-radio>
+              </sl-radio-group>
+            </div>
+            <div class="form-group actions">
+              <sl-button
+                variant="primary"
+                ?disabled=${!this._selectedPlace}
+                @click=${this._submitCheckin}
+              >
+                Check In
+              </sl-button>
+            </div>
+          `}
     `
   }
 
-  async _checkin (e) {
-    const btn = e.currentTarget
-    const placeId = btn.dataset.placeId
-    const place = await this.toObject(placeId)
+  async _submitCheckin () {
+    const place = this._places.find(p => p.id === this._selectedPlace)
+    if (!place) return
+
     const actor = await this.getActor()
-    let activity = {
+    const activity = {
       actor: {
         id: actor.id,
         name: actor.name,
@@ -151,17 +197,24 @@ export class CheckinChoosePlaceElement extends CheckinElement {
         name: place.name,
         url: place.url
       },
-      to: 'https://www.w3.org/ns/activitystreams#Public'
+      content: this._note || undefined,
+    }
+
+    const followers = await this.toId(actor.followers)
+
+    if (this._privacy === 'public') {
+      activity.to = 'https://www.w3.org/ns/activitystreams#Public'
+      activity.cc = followers
+    } else {
+      activity.to = followers
     }
 
     activity.summaryMap = {
       en: this.makeSummary(activity)
     }
 
-    activity = await this.doActivity(activity)
-
-    // Go to the inbox
-    window.location.hash = ''
+    await this.doActivity(activity)
+    window.location = '/'
   }
 }
 
