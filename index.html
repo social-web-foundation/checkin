@@ -20,27 +20,13 @@
         --max-width: 75ch;
         --gap: 1rem;
         --sl-font-sans: "Inter", system-ui, sans-serif;
-        --sl-color-danger-500: #d32f2f;
-        --bg-main: #fffff0;
-        --bg-header: #7b3f00;
-        --sl-color-neutral-100: #fffff0;
-        --sl-color-neutral-900: #3b2f2f;
-        --sl-color-primary-100: #fff1e0;
-        --sl-color-primary-500: #c68e17;
-        --sl-color-primary-700: #a06500;
       }
       body {
         font-family: var(--sl-font-sans);
-        background: var(--bg-main);
-        color: var(--sl-color-neutral-900);
         display: grid;
         grid-template-rows: auto 1fr auto;
         min-height: 100vh;
         margin: 0;
-      }
-      header {
-        background: var(--bg-header);
-        color: var(--sl-color-neutral-100);
       }
       .spinner-page {
         display: flex;
@@ -48,12 +34,6 @@
         align-items: center;
         height: 100vh;
         padding: 1rem;
-      }
-       sl-button[variant="primary"] {
-        background: var(--sl-color-primary-500);
-      }
-      sl-button[variant="primary"]:hover {
-        background: var(--sl-color-primary-700);
       }
     </style>
     <script type="module" src="js/checkin-login.js"></script>
