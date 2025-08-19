@@ -48,7 +48,7 @@ export class CheckinActivityElement extends CheckinElement {
     }
 
     /* content */
-    content {
+    .content {
       font-style: italic;
     }
 
