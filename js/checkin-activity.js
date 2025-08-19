@@ -46,6 +46,20 @@ export class CheckinActivityElement extends CheckinElement {
     sl-relative-time {
       font-size: inherit;
     }
+
+    /* content */
+    content {
+      font-style: italic;
+    }
+
+    .content::before {
+      content: "“";
+      margin-right: 0.1em;
+    }
+    .content::after {
+      content: "”";
+      margin-left: 0.1em;
+    }
   `
 
   static get properties () {
@@ -117,12 +131,19 @@ export class CheckinActivityElement extends CheckinElement {
         </div>
 
         <div class="card-body">
-          <p>
+          <p class="summary">
             ${this.activity.summary
               ? unsafeHTML(DOMPurify.sanitize(this.activity.summary))
               : this.activity.summaryMap?.en
               ? unsafeHTML(DOMPurify.sanitize(this.activity.summaryMap.en))
               : unsafeHTML(this.makeSummary(this.activity))}
+          </p>
+          <p class="content">
+            ${this.activity.content
+              ? unsafeHTML(DOMPurify.sanitize(this.activity.content))
+              : (this.activity.contentMap?.en)
+              ? unsafeHTML(DOMPurify.sanitize(this.activity.contentMap.en))
+              : ''}
           </p>
         </div>
 
