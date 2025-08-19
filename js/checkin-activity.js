@@ -139,9 +139,9 @@ export class CheckinActivityElement extends CheckinElement {
               : unsafeHTML(this.makeSummary(this.activity))}
           </p>
           ${this.activity.content
-            ? <p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.content))}</p>
+            ? html`<p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.content))}</p>`
             : (this.activity.contentMap?.en)
-            ? <p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.contentMap?.en))}</p>
+            ? html`<p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.contentMap?.en))}</p>`
             : ''}
         </div>
 
