@@ -138,13 +138,11 @@ export class CheckinActivityElement extends CheckinElement {
               ? unsafeHTML(DOMPurify.sanitize(this.activity.summaryMap.en))
               : unsafeHTML(this.makeSummary(this.activity))}
           </p>
-          <p class="content">
-            ${this.activity.content
-              ? unsafeHTML(DOMPurify.sanitize(this.activity.content))
-              : (this.activity.contentMap?.en)
-              ? unsafeHTML(DOMPurify.sanitize(this.activity.contentMap.en))
-              : ''}
-          </p>
+          ${this.activity.content
+            ? <p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.content))}</p>
+            : (this.activity.contentMap?.en)
+            ? <p class="content">${unsafeHTML(DOMPurify.sanitize(this.activity.contentMap?.en))}</p>
+            : ''}
         </div>
 
         <div slot="footer" class="card-footer">
