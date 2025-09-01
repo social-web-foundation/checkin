@@ -152,24 +152,6 @@ export class CheckinLoginElement extends LitElement {
     return actor.endpoints?.proxyUrl
   }
 
-  generateCodeVerifier (length = 64) {
-    const array = new Uint8Array(length)
-    crypto.getRandomValues(array)
-    return this.base64UrlEncode(array)
-  }
-
-  async generateCodeChallenge (verifier) {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(verifier)
-    const digest = await crypto.subtle.digest('SHA-256', data)
-    return this.base64UrlEncode(new Uint8Array(digest))
-  }
-
-  base64UrlEncode (buffer) {
-    const b64 = btoa(String.fromCharCode(...buffer))
-    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-  }
-
   async _login () {
     const webfingerInput = this.shadowRoot.querySelector('#webfinger')
     const id = webfingerInput.value.trim()
@@ -185,7 +167,7 @@ export class CheckinLoginElement extends LitElement {
       if (!tokenUrl) {
         throw new Error(`No OAuth token endpoint.`)
       }
-      sessionStorage.setItem('oauth_token_url', tokenUrl)
+      sessionStorage.setItem('token_endpoint', tokenUrl)
       const proxyUrl = await this.getProxyUrl(actor)
       if (!proxyUrl) {
         throw new Error(`No Proxy endpoint.`)
@@ -195,6 +177,7 @@ export class CheckinLoginElement extends LitElement {
       if (!authorizationUrl) {
         throw new Error(`No OAuth authorization endpoint.`)
       }
+      sessionStorage.setItem('authorization_endpoint', authorizationUrl)
 
       const code_verifier = oauth.generateRandomCodeVerifier();
       const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier);

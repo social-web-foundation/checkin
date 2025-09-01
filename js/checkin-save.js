@@ -17,8 +17,31 @@ export class CheckinSaveElement extends LitElement {
     }
   }
 
+  #authorizationServer
+  #client
+  #clientAuth
+  #state
+  #codeVerifier
+
   constructor () {
     super()
+
+    this.#clientAuth = oauth.None()
+    this.#client = {
+      client_id: this.clientId
+    }
+    this.#authorizationServer = {
+      issuer: (new URL(sessionStorage.getItem('actor_id'))).origin,
+      authorization_endpoint: sessionStorage.getItem('authorization_endpoint'),
+      token_endpoint: sessionStorage.getItem('token_endpoint'),
+      code_challenge_methods_supported: ['S256'],
+      scopes_supported: ['read', 'write'],
+      response_types_supported: ['code'],
+      grant_types_supported: ['authorization_code', 'refresh_token'],
+    }
+
+    this.#state = sessionStorage.getItem('state')
+    this.#codeVerifier = sessionStorage.getItem('code_verifier')
   }
 
   connectedCallback () {
@@ -32,78 +55,51 @@ export class CheckinSaveElement extends LitElement {
       })
   }
 
-  async handleLogin () {
-    const params = new URLSearchParams(window.location.search)
-    const savedState = sessionStorage.getItem('state')
+
+  clearSession () {
     sessionStorage.removeItem('state')
-    if (params.get('state') !== savedState) {
-      throw new Error('Bad state')
-    } else {
-      const error = params.get("error");
-      const error_description = params.get("error_description")
-      if (error) {
-        switch (error) {
-          case "invalid_request":
-            throw new Error((error_description)
-              ? `Invalid request: ${error_description}`
-              : 'Invalid request'
-            );
-            break;
-          case "access_denied":
-            throw new Error((error_description)
-              ? `Access denied: ${error_description}`
-              : 'Access denied.'
-            );
-            break;
-          case "unauthorized_client":
-            throw new Error(`Unauthorized client.`);
-            break;
-          case "unsupported_response_type":
-            throw new Error(`Unsupported response_type parameter.`);
-            break;
-          case "invalid_scope":
-            throw new Error(`Invalid scope parameter.`);
-            break;
-          case "server_error":
-            throw new Error((error_description)
-              ? `The server had an error: ${error_description}`
-              : 'The server had an error.'
-            );
-            break;
-          case "temporarily_unavailable":
-            throw new Error(
-              `The server is temporarily unavailable.`
-            );
-            break;
-        }
-      } else {
-        const code = params.get("code");
-        const code_verifier = sessionStorage.getItem('code_verifier');
-        const tokenUrl = sessionStorage.getItem('oauth_token_url')
-        const response = await fetch(tokenUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            grant_type: 'authorization_code',
-            code,
-            client_id: this.clientId,
-            redirect_uri: this.redirectUri,
-            code_verifier,
-          }),
-        });
-        const result = await response.json();
-        sessionStorage.setItem('access_token', result.access_token)
-        sessionStorage.setItem('refresh_token', result.refresh_token)
-        sessionStorage.setItem('expires_in', result.expires_in)
-        sessionStorage.setItem(
-          'expires',
-          Date.now() + result.expires_in * 1000
-        )
-        window.location = this.successUri
-      }
-    }
+    sessionStorage.removeItem('code_verifier')
+  }
+
+  saveResult () {
+    sessionStorage.setItem('access_token', result.access_token)
+    sessionStorage.setItem('refresh_token', result.refresh_token)
+    sessionStorage.setItem('expires_in', result.expires_in)
+    sessionStorage.setItem(
+      'expires',
+      Date.now() + result.expires_in * 1000
+    )
+  }
+
+  async handleLogin () {
+
+    const params = oauth.validateAuthResponse(
+      this.#authorizationServer,
+      this.#client,
+      window.location,
+      this.#state
+    )
+
+    const response = await oauth.authorizationCodeGrantRequest(
+      this.#authorizationServer,
+      this.#client,
+      this.#clientAuth,
+      params,
+      this.redirectUri,
+      this.#codeVerifier,
+    )
+
+    const result = await oauth.processAuthorizationCodeResponse(
+      this.#authorizationServer,
+      this.#client,
+      response
+    )
+
+    this.saveResult(result)
+
+    this.clearSession()
+
+    window.location = this.successUri
   }
 
   render () {
