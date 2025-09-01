@@ -34,8 +34,8 @@ export class CheckinSaveElement extends LitElement {
 
   async handleLogin () {
     const params = new URLSearchParams(window.location.search)
-    const savedState = sessionStorage.getItem('oauth_state')
-    sessionStorage.removeItem('oauth_state')
+    const savedState = sessionStorage.getItem('state')
+    sessionStorage.removeItem('state')
     if (params.get('state') !== savedState) {
       throw new Error('Bad state')
     } else {
