@@ -54,10 +54,18 @@
       document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);
         document.getElementById("page").innerHTML = params.get("state")
-          ? `<checkin-save client-id=${client_id} redirect-uri=${redirect_uri} />`
+          ? `<checkin-save
+                client-id=${client_id}
+                redirect-uri=${redirect_uri}
+                success-uri=${redirect_uri}
+              />`
           : !sessionStorage.getItem("access_token")
-          ? `<checkin-login client-id=${client_id} redirect-uri=${redirect_uri} />`
-          : `<checkin-home client-id=${client_id} redirect-uri=${redirect_uri} />`;
+            ? `<checkin-login
+                client-id=${client_id}
+                redirect-uri=${redirect_uri} />`
+            : `<checkin-home
+                client-id=${client_id}
+                redirect-uri=${redirect_uri} />`;
       });
     </script>
   </body>

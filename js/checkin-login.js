@@ -4,7 +4,7 @@ import {
   LitElement
 } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 
-import { CheckinElement } from './checkin-element.js'
+import oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3.7.0/+esm'
 
 export class CheckinLoginElement extends LitElement {
   WEBFINGER_REGEXP =
@@ -195,21 +195,25 @@ export class CheckinLoginElement extends LitElement {
       if (!authorizationUrl) {
         throw new Error(`No OAuth authorization endpoint.`)
       }
+
+      const code_verifier = oauth.generateRandomCodeVerifier();
+      const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier);
       const state = crypto.randomUUID()
-      sessionStorage.setItem('oauth_state', state)
-      const verifier = this.generateCodeVerifier()
-      sessionStorage.setItem('oauth_pkce_verifier', verifier)
-      const challenge = await this.generateCodeChallenge(verifier)
-      const params = new URLSearchParams({
-        response_type: 'code',
-        client_id: this.clientId,
-        redirect_uri: this.redirectUri,
-        scope: 'read write',
-        state,
-        code_challenge: challenge,
-        code_challenge_method: 'S256'
-      })
-      window.location = `${authorizationUrl}?${params}`
+
+      sessionStorage.setItem('code_verifier', code_verifier);
+      sessionStorage.setItem('state', state);
+
+      const url = new URL(authorizationUrl);
+
+      url.searchParams.set('client_id', this.clientId);
+      url.searchParams.set('redirect_uri', this.redirectUri);
+      url.searchParams.set('response_type', 'code');
+      url.searchParams.set('scope', 'read write');
+      url.searchParams.set('code_challenge', code_challenge);
+      url.searchParams.set('code_challenge_method', 'S256');
+      url.searchParams.set('state', state);
+
+      window.location.href = url.toString();  // redirect to auth server
     } catch (error) {
       this._error = error.message
     }

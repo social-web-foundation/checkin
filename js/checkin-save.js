@@ -4,11 +4,14 @@ import {
   LitElement
 } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 
+import oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3.7.0/+esm'
+
 export class CheckinSaveElement extends LitElement {
   static get properties () {
     return {
       redirectUri: { type: String, attribute: 'redirect-uri' },
       clientId: { type: String, attribute: 'client-id' },
+      successUri: { type: String, attribute: 'success-uri' },
       _error: { type: String, state: true }
     }
   }
@@ -21,7 +24,7 @@ export class CheckinSaveElement extends LitElement {
     super.connectedCallback()
     this.handleLogin()
       .then(() => {
-        window.location = redirect_uri
+        window.location = this.redirectUri
       })
       .catch((err) => {
         this._error = err.message
@@ -34,39 +37,70 @@ export class CheckinSaveElement extends LitElement {
     sessionStorage.removeItem('oauth_state')
     if (params.get('state') !== savedState) {
       throw new Error('Bad state')
-    }
-    if (params.get('error')) {
-      throw new Error(params.get('error'))
-    }
-    if (params.get('code')) {
-      const code = params.get('code')
-      const url = sessionStorage.getItem('oauth_token_url')
-      const code_verifier = sessionStorage.getItem('oauth_pkce_verifier')
-      sessionStorage.removeItem('oauth_pkce_verifier')
-      const tp = new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        client_id: this.clientId,
-        redirect_uri: this.redirectUri,
-        code_verifier
-      })
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: tp
-      })
-      if (!res.ok) {
-        throw new Error('Error')
+    } else {
+      const error = params.get("error");
+      const error_description = params.get("error_description")
+      if (error) {
+        switch (error) {
+          case "invalid_request":
+            throw new Error((error_description)
+              ? `Invalid request: ${error_description}`
+              : 'Invalid request'
+            );
+            break;
+          case "access_denied":
+            throw new Error((error_description)
+              ? `Access denied: ${error_description}`
+              : 'Access denied.'
+            );
+            break;
+          case "unauthorized_client":
+            throw new Error(`Unauthorized client.`);
+            break;
+          case "unsupported_response_type":
+            throw new Error(`Unsupported response_type parameter.`);
+            break;
+          case "invalid_scope":
+            throw new Error(`Invalid scope parameter.`);
+            break;
+          case "server_error":
+            throw new Error((error_description)
+              ? `The server had an error: ${error_description}`
+              : 'The server had an error.'
+            );
+            break;
+          case "temporarily_unavailable":
+            throw new Error(
+              `The server is temporarily unavailable.`
+            );
+            break;
+        }
       } else {
-        const json = await res.json()
-        sessionStorage.setItem('access_token', json.access_token)
-        sessionStorage.setItem('refresh_token', json.refresh_token)
-        sessionStorage.setItem('expires_in', json.expires_in)
+        const code = params.get("code");
+        const code_verifier = sessionStorage.getItem('code_verifier');
+        const tokenUrl = sessionStorage.getItem('oauth_token_url')
+        const response = await fetch(tokenUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code,
+            client_id: this.clientId,
+            redirect_uri: this.redirectUri,
+            code_verifier,
+          }),
+        });
+        const result = await response.json();
+        sessionStorage.setItem('access_token', result.access_token)
+        sessionStorage.setItem('refresh_token', result.refresh_token)
+        sessionStorage.setItem('expires_in', result.expires_in)
         sessionStorage.setItem(
           'expires',
-          Date.now() + json.expires_in * 1000
+          Date.now() + result.expires_in * 1000
         )
-        window.location = this.redirectUri
+        window.location = this.successUri
       }
     }
   }
