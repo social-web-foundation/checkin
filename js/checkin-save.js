@@ -71,40 +71,47 @@ export class CheckinSaveElement extends LitElement {
     }
 
     const state = sessionStorage.getItem('state')
-
-    const params = oauth.validateAuthResponse(
-      authorizationServer,
-      client,
-      window.location,
-      state
-    )
-
     const codeVerifier = sessionStorage.getItem('code_verifier')
 
-    const response = await oauth.authorizationCodeGrantRequest(
-      authorizationServer,
-      client,
-      clientAuth,
-      params,
-      this.redirectUri,
-      codeVerifier,
-    )
+    try {
 
-    const result = await oauth.processAuthorizationCodeResponse(
-      authorizationServer,
-      client,
-      response
-    )
+      const params = oauth.validateAuthResponse(
+        authorizationServer,
+        client,
+        window.location,
+        state
+      )
 
-    this.saveResult(result)
 
-    this.clearSession()
+      const response = await oauth.authorizationCodeGrantRequest(
+        authorizationServer,
+        client,
+        clientAuth,
+        params,
+        this.redirectUri,
+        codeVerifier,
+      )
 
-    window.location = this.successUri
+      const result = await oauth.processAuthorizationCodeResponse(
+        authorizationServer,
+        client,
+        response
+      )
+
+      this.saveResult(result)
+
+      this.clearSession()
+
+      window.location = this.successUri
+    } catch (error) {
+      this._error = error.message
+    }
   }
 
   render () {
-    return html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
+    return (this._error)
+      ? html`<sl-alert>${this._error}</sl-alert>`
+      : html`<sl-spinner style='font-size: 2rem;'></sl-spinner>`
   }
 }
 
