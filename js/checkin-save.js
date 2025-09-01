@@ -4,7 +4,8 @@ import {
   LitElement
 } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js'
 
-import oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3.7.0/+esm'
+import * as oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3/+esm'
+
 
 export class CheckinSaveElement extends LitElement {
   static get properties () {
