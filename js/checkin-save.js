@@ -25,23 +25,6 @@ export class CheckinSaveElement extends LitElement {
 
   constructor () {
     super()
-
-    this.#clientAuth = oauth.None()
-    this.#client = {
-      client_id: this.clientId
-    }
-    this.#authorizationServer = {
-      issuer: (new URL(sessionStorage.getItem('actor_id'))).origin,
-      authorization_endpoint: sessionStorage.getItem('authorization_endpoint'),
-      token_endpoint: sessionStorage.getItem('token_endpoint'),
-      code_challenge_methods_supported: ['S256'],
-      scopes_supported: ['read', 'write'],
-      response_types_supported: ['code'],
-      grant_types_supported: ['authorization_code', 'refresh_token'],
-    }
-
-    this.#state = sessionStorage.getItem('state')
-    this.#codeVerifier = sessionStorage.getItem('code_verifier')
   }
 
   connectedCallback () {
@@ -73,25 +56,43 @@ export class CheckinSaveElement extends LitElement {
 
   async handleLogin () {
 
+    const authorizationServer = {
+      issuer: (new URL(sessionStorage.getItem('actor_id'))).origin,
+      authorization_endpoint: sessionStorage.getItem('authorization_endpoint'),
+      token_endpoint: sessionStorage.getItem('token_endpoint'),
+      code_challenge_methods_supported: ['S256'],
+      scopes_supported: ['read', 'write'],
+      response_types_supported: ['code'],
+      grant_types_supported: ['authorization_code', 'refresh_token'],
+    }
+    const clientAuth = oauth.None()
+    const client = {
+      client_id: this.clientId
+    }
+
+    const state = sessionStorage.getItem('state')
+
     const params = oauth.validateAuthResponse(
-      this.#authorizationServer,
-      this.#client,
+      authorizationServer,
+      client,
       window.location,
-      this.#state
+      state
     )
 
+    const codeVerifier = sessionStorage.getItem('code_verifier')
+
     const response = await oauth.authorizationCodeGrantRequest(
-      this.#authorizationServer,
-      this.#client,
-      this.#clientAuth,
+      authorizationServer,
+      client,
+      clientAuth,
       params,
       this.redirectUri,
-      this.#codeVerifier,
+      codeVerifier,
     )
 
     const result = await oauth.processAuthorizationCodeResponse(
-      this.#authorizationServer,
-      this.#client,
+      authorizationServer,
+      client,
       response
     )
 
