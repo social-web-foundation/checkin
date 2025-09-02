@@ -148,18 +148,18 @@ export class CheckinInboxElement extends CheckinElement {
 
   async _loadActivities () {
     this._isLoading = true
-    const activitiesJSON = sessionStorage.getItem('inbox-activities')
+    const activitiesJSON = localStorage.getItem('inbox-activities')
     const cached = activitiesJSON ? JSON.parse(activitiesJSON) : []
 
     if (cached.length > 0) {
       this._activities = [...cached].slice(0, this.MAX_ACTIVITIES)
     }
 
-    let inbox = sessionStorage.getItem('inbox')
+    let inbox = localStorage.getItem('inbox')
     if (!inbox) {
       const actor = await this.getActor()
       inbox = await this.toId(actor.inbox)
-      sessionStorage.setItem('inbox', inbox)
+      localStorage.setItem('inbox', inbox)
     }
 
     const latestId = cached && cached.length > 0 ? cached[0].id : null
@@ -202,7 +202,7 @@ export class CheckinInboxElement extends CheckinElement {
     }
 
     if (this._activities) {
-      sessionStorage.setItem(
+      localStorage.setItem(
         'inbox-activities',
         JSON.stringify(this._activities)
       )

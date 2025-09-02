@@ -59,7 +59,7 @@
                 redirect-uri=${redirect_uri}
                 success-uri=${redirect_uri}
               />`
-          : !sessionStorage.getItem("access_token")
+          : !localStorage.getItem("access_token")
             ? `<checkin-login
                 client-id=${client_id}
                 redirect-uri=${redirect_uri} />`

@@ -18,11 +18,11 @@ export class CheckinElement extends LitElement {
   }
 
   async doActivity (obj) {
-    let outbox = sessionStorage.getItem('outbox')
+    let outbox = localStorage.getItem('outbox')
     if (!outbox) {
       const actor = await this.getActor()
       outbox = actor.outbox
-      sessionStorage.setItem('outbox', outbox)
+      localStorage.setItem('outbox', outbox)
     }
     const res = await this.apFetch(outbox, {
       method: 'POST',
@@ -38,10 +38,10 @@ export class CheckinElement extends LitElement {
   }
 
   async ensureFreshToken () {
-    const expires = parseInt(sessionStorage.getItem('expires'))
+    const expires = parseInt(localStorage.getItem('expires'))
     if (Date.now() > expires) {
-      const url = sessionStorage.getItem('oauth_token_url')
-      const refresh_token = sessionStorage.getItem('refresh_token')
+      const url = localStorage.getItem('oauth_token_url')
+      const refresh_token = localStorage.getItem('refresh_token')
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -56,14 +56,14 @@ export class CheckinElement extends LitElement {
       } else {
         const json = await res.json()
         if (json.access_token) {
-          sessionStorage.setItem('access_token', json.access_token)
+          localStorage.setItem('access_token', json.access_token)
         }
         if (json.refresh_token) {
-          sessionStorage.setItem('refresh_token', json.refresh_token)
+          localStorage.setItem('refresh_token', json.refresh_token)
         }
         if (json.expires_in) {
-          sessionStorage.setItem('expires_in', json.expires_in)
-          sessionStorage.setItem(
+          localStorage.setItem('expires_in', json.expires_in)
+          localStorage.setItem(
             'expires',
             Date.now() + json.expires_in * 1000
           )
@@ -74,8 +74,8 @@ export class CheckinElement extends LitElement {
 
   async apFetch (url, options = {}) {
     await this.ensureFreshToken()
-    const accessToken = sessionStorage.getItem('access_token')
-    const actorId = sessionStorage.getItem('actor_id')
+    const accessToken = localStorage.getItem('access_token')
+    const actorId = localStorage.getItem('actor_id')
     if (URL.parse(url).origin == URL.parse(actorId).origin) {
       if (!options.headers) {
         options.headers = {}
@@ -83,7 +83,7 @@ export class CheckinElement extends LitElement {
       options.headers.Authorization = `Bearer ${accessToken}`
       return await fetch(url, options)
     } else {
-      const proxyUrl = sessionStorage.getItem('proxy_url')
+      const proxyUrl = localStorage.getItem('proxy_url')
       return await fetch(proxyUrl, {
         method: 'POST',
         headers: {
@@ -98,11 +98,11 @@ export class CheckinElement extends LitElement {
   }
 
   async getActor () {
-    const actorJSON = sessionStorage.getItem('actor')
+    const actorJSON = localStorage.getItem('actor')
     if (actorJSON) {
       return JSON.parse(actorJSON)
     } else {
-      const actorId = sessionStorage.getItem('actor_id')
+      const actorId = localStorage.getItem('actor_id')
       const res = await this.apFetch(actorId, {
         headers: {
           Accept:
@@ -113,7 +113,7 @@ export class CheckinElement extends LitElement {
         throw new Error('Failure fetching actor')
       }
       const actor = await res.json()
-      sessionStorage.setItem('actor', JSON.stringify(actor))
+      localStorage.setItem('actor', JSON.stringify(actor))
       return actor
     }
   }
@@ -178,13 +178,13 @@ export class CheckinElement extends LitElement {
     const id = await this.toId(item)
     let json
     if (!noCache) {
-      const cached = sessionStorage.getItem(`cache:${id}`)
+      const cached = localStorage.getItem(`cache:${id}`)
       if (cached) {
         try {
           const json = JSON.parse(cached)
           return json
         } catch (err) {
-          sessionStorage.removeItem(`cache:${id}`)
+          localStorage.removeItem(`cache:${id}`)
           console.error(err)
         }
       }
@@ -208,7 +208,7 @@ export class CheckinElement extends LitElement {
               : null
     }
     if (!noCache) {
-      sessionStorage.setItem(`cache:${id}`, JSON.stringify(json))
+      localStorage.setItem(`cache:${id}`, JSON.stringify(json))
     }
     return json
   }

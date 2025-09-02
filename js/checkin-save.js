@@ -38,15 +38,15 @@ export class CheckinSaveElement extends LitElement {
   }
 
   clearSession () {
-    sessionStorage.removeItem('state')
-    sessionStorage.removeItem('code_verifier')
+    localStorage.removeItem('state')
+    localStorage.removeItem('code_verifier')
   }
 
   saveResult (result) {
-    sessionStorage.setItem('access_token', result.access_token)
-    sessionStorage.setItem('refresh_token', result.refresh_token)
-    sessionStorage.setItem('expires_in', result.expires_in)
-    sessionStorage.setItem(
+    localStorage.setItem('access_token', result.access_token)
+    localStorage.setItem('refresh_token', result.refresh_token)
+    localStorage.setItem('expires_in', result.expires_in)
+    localStorage.setItem(
       'expires',
       Date.now() + result.expires_in * 1000
     )
@@ -54,9 +54,9 @@ export class CheckinSaveElement extends LitElement {
 
   async handleLogin () {
     const authorizationServer = {
-      issuer: (new URL(sessionStorage.getItem('actor_id'))).origin,
-      authorization_endpoint: sessionStorage.getItem('authorization_endpoint'),
-      token_endpoint: sessionStorage.getItem('token_endpoint'),
+      issuer: (new URL(localStorage.getItem('actor_id'))).origin,
+      authorization_endpoint: localStorage.getItem('authorization_endpoint'),
+      token_endpoint: localStorage.getItem('token_endpoint'),
       code_challenge_methods_supported: ['S256'],
       scopes_supported: ['read', 'write'],
       response_types_supported: ['code'],

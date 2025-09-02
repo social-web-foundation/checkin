@@ -77,7 +77,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
 
   async getPlaces (latitude, longitude) {
     const key = `places:${this._lat.toFixed(5)},${this._lon.toFixed(5)}`
-    const cached = sessionStorage.getItem(key)
+    const cached = localStorage.getItem(key)
     if (cached) {
       return JSON.parse(cached)
     }
@@ -104,7 +104,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
 
     const collection = await res.json()
     const places = collection.items.filter((p) => p.name)
-    sessionStorage.setItem(key, JSON.stringify(places))
+    localStorage.setItem(key, JSON.stringify(places))
     return places
   }
 

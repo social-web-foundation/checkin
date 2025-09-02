@@ -116,7 +116,7 @@ export class CheckinHomeElement extends CheckinElement {
   }
 
   _logout () {
-    sessionStorage.clear()
+    localStorage.clear()
     window.location = this.redirectUri
   }
 }

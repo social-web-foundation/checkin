@@ -161,23 +161,23 @@ export class CheckinLoginElement extends LitElement {
     }
     try {
       const actorId = await this.getActorId(id)
-      sessionStorage.setItem('actor_id', actorId)
+      localStorage.setItem('actor_id', actorId)
       const actor = await this.getActor(actorId)
       const tokenUrl = await this.getTokenEndpoint(actor)
       if (!tokenUrl) {
         throw new Error('No OAuth token endpoint.')
       }
-      sessionStorage.setItem('token_endpoint', tokenUrl)
+      localStorage.setItem('token_endpoint', tokenUrl)
       const proxyUrl = await this.getProxyUrl(actor)
       if (!proxyUrl) {
         throw new Error('No Proxy endpoint.')
       }
-      sessionStorage.setItem('proxy_url', proxyUrl)
+      localStorage.setItem('proxy_url', proxyUrl)
       const authorizationUrl = await this.getAuthorizationEndpoint(actor)
       if (!authorizationUrl) {
         throw new Error('No OAuth authorization endpoint.')
       }
-      sessionStorage.setItem('authorization_endpoint', authorizationUrl)
+      localStorage.setItem('authorization_endpoint', authorizationUrl)
 
       const code_verifier = oauth.generateRandomCodeVerifier()
       const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
