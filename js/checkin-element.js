@@ -40,7 +40,7 @@ export class CheckinElement extends LitElement {
   async ensureFreshToken () {
     const expires = parseInt(localStorage.getItem('expires'))
     if (Date.now() > expires) {
-      const url = localStorage.getItem('oauth_token_url')
+      const url = localStorage.getItem('token_endpoint')
       const refresh_token = localStorage.getItem('refresh_token')
       const res = await fetch(url, {
         method: 'POST',
