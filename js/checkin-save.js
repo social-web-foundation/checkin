@@ -6,7 +6,6 @@ import {
 
 import * as oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3/+esm'
 
-
 export class CheckinSaveElement extends LitElement {
   static get properties () {
     return {
@@ -38,7 +37,6 @@ export class CheckinSaveElement extends LitElement {
       })
   }
 
-
   clearSession () {
     sessionStorage.removeItem('state')
     sessionStorage.removeItem('code_verifier')
@@ -55,7 +53,6 @@ export class CheckinSaveElement extends LitElement {
   }
 
   async handleLogin () {
-
     const authorizationServer = {
       issuer: (new URL(sessionStorage.getItem('actor_id'))).origin,
       authorization_endpoint: sessionStorage.getItem('authorization_endpoint'),
@@ -63,7 +60,7 @@ export class CheckinSaveElement extends LitElement {
       code_challenge_methods_supported: ['S256'],
       scopes_supported: ['read', 'write'],
       response_types_supported: ['code'],
-      grant_types_supported: ['authorization_code', 'refresh_token'],
+      grant_types_supported: ['authorization_code', 'refresh_token']
     }
     const clientAuth = oauth.None()
     const client = {
@@ -74,7 +71,6 @@ export class CheckinSaveElement extends LitElement {
     const codeVerifier = sessionStorage.getItem('code_verifier')
 
     try {
-
       const params = oauth.validateAuthResponse(
         authorizationServer,
         client,
@@ -82,14 +78,13 @@ export class CheckinSaveElement extends LitElement {
         state
       )
 
-
       const response = await oauth.authorizationCodeGrantRequest(
         authorizationServer,
         client,
         clientAuth,
         params,
         this.redirectUri,
-        codeVerifier,
+        codeVerifier
       )
 
       const result = await oauth.processAuthorizationCodeResponse(

@@ -165,38 +165,38 @@ export class CheckinLoginElement extends LitElement {
       const actor = await this.getActor(actorId)
       const tokenUrl = await this.getTokenEndpoint(actor)
       if (!tokenUrl) {
-        throw new Error(`No OAuth token endpoint.`)
+        throw new Error('No OAuth token endpoint.')
       }
       sessionStorage.setItem('token_endpoint', tokenUrl)
       const proxyUrl = await this.getProxyUrl(actor)
       if (!proxyUrl) {
-        throw new Error(`No Proxy endpoint.`)
+        throw new Error('No Proxy endpoint.')
       }
       sessionStorage.setItem('proxy_url', proxyUrl)
       const authorizationUrl = await this.getAuthorizationEndpoint(actor)
       if (!authorizationUrl) {
-        throw new Error(`No OAuth authorization endpoint.`)
+        throw new Error('No OAuth authorization endpoint.')
       }
       sessionStorage.setItem('authorization_endpoint', authorizationUrl)
 
-      const code_verifier = oauth.generateRandomCodeVerifier();
-      const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier);
+      const code_verifier = oauth.generateRandomCodeVerifier()
+      const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
       const state = crypto.randomUUID()
 
-      sessionStorage.setItem('code_verifier', code_verifier);
-      sessionStorage.setItem('state', state);
+      sessionStorage.setItem('code_verifier', code_verifier)
+      sessionStorage.setItem('state', state)
 
-      const url = new URL(authorizationUrl);
+      const url = new URL(authorizationUrl)
 
-      url.searchParams.set('client_id', this.clientId);
-      url.searchParams.set('redirect_uri', this.redirectUri);
-      url.searchParams.set('response_type', 'code');
-      url.searchParams.set('scope', 'read write');
-      url.searchParams.set('code_challenge', code_challenge);
-      url.searchParams.set('code_challenge_method', 'S256');
-      url.searchParams.set('state', state);
+      url.searchParams.set('client_id', this.clientId)
+      url.searchParams.set('redirect_uri', this.redirectUri)
+      url.searchParams.set('response_type', 'code')
+      url.searchParams.set('scope', 'read write')
+      url.searchParams.set('code_challenge', code_challenge)
+      url.searchParams.set('code_challenge_method', 'S256')
+      url.searchParams.set('state', state)
 
-      window.location.href = url.toString();  // redirect to auth server
+      window.location.href = url.toString() // redirect to auth server
     } catch (error) {
       this._error = error.message
     }
