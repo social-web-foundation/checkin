@@ -5,6 +5,8 @@ import {
   unsafeHTML
 } from 'https://cdn.jsdelivr.net/gh/lit/dist@3/all/lit-all.min.js'
 
+import * as oauth from 'https://cdn.jsdelivr.net/npm/oauth4webapi@3/+esm'
+
 export class CheckinElement extends LitElement {
   static get properties () {
     return {
@@ -37,37 +39,48 @@ export class CheckinElement extends LitElement {
     return await res.json()
   }
 
+  saveResult (result) {
+    localStorage.setItem('access_token', result.access_token)
+    localStorage.setItem('refresh_token', result.refresh_token)
+    localStorage.setItem('expires_in', result.expires_in)
+    localStorage.setItem(
+      'expires',
+      Date.now() + result.expires_in * 1000
+    )
+  }
+
   async ensureFreshToken () {
     const expires = parseInt(localStorage.getItem('expires'))
     if (Date.now() > expires) {
-      const url = localStorage.getItem('token_endpoint')
-      const refresh_token = localStorage.getItem('refresh_token')
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token,
-          client_id: this.clientId
-        })
-      })
-      if (!res.ok) {
-        console.error('Error')
-      } else {
-        const json = await res.json()
-        if (json.access_token) {
-          localStorage.setItem('access_token', json.access_token)
-        }
-        if (json.refresh_token) {
-          localStorage.setItem('refresh_token', json.refresh_token)
-        }
-        if (json.expires_in) {
-          localStorage.setItem('expires_in', json.expires_in)
-          localStorage.setItem(
-            'expires',
-            Date.now() + json.expires_in * 1000
-          )
-        }
+      const authorizationServer = {
+        issuer: (new URL(localStorage.getItem('actor_id'))).origin,
+        authorization_endpoint: localStorage.getItem('authorization_endpoint'),
+        token_endpoint: localStorage.getItem('token_endpoint'),
+        code_challenge_methods_supported: ['S256'],
+        scopes_supported: ['read', 'write'],
+        response_types_supported: ['code'],
+        grant_types_supported: ['authorization_code', 'refresh_token']
+      }
+      const clientAuth = oauth.None()
+      const client = {
+        client_id: this.clientId
+      }
+      const refreshToken = localStorage.getItem('refresh_token')
+      try {
+        const response = await oauth.refreshTokenGrantRequest(
+          as,
+          client,
+          clientAuth,
+          refreshToken
+        )
+        const result = await oauth.processRefreshTokenResponse(
+          as,
+          client,
+          response
+        )
+        this.saveResult(result)
+      } catch (error) {
+        console.error(error)
       }
     }
   }
@@ -76,24 +89,30 @@ export class CheckinElement extends LitElement {
     await this.ensureFreshToken()
     const accessToken = localStorage.getItem('access_token')
     const actorId = localStorage.getItem('actor_id')
-    if (URL.parse(url).origin == URL.parse(actorId).origin) {
-      if (!options.headers) {
-        options.headers = {}
-      }
-      options.headers.Authorization = `Bearer ${accessToken}`
-      return await fetch(url, options)
+    const urlObj = (typeof url === 'string')
+      ? new URL(url)
+      : url
+    if (urlObj.origin == URL.parse(actorId).origin) {
+      return await oauth.protectedResourceRequest(
+        accessToken,
+        options.method || 'GET',
+        urlObj,
+        options.headers,
+        options.body
+      )
     } else {
       const proxyUrl = localStorage.getItem('proxy_url')
-      return await fetch(proxyUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Bearer ${accessToken}`
+      return await oauth.protectedResourceRequest(
+        accessToken,
+        'POST',
+        proxyUrl,
+        {
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams({
-          id: url
+        new URLSearchParams({
+          id: urlObj.toString()
         })
-      })
+      )
     }
   }
 
