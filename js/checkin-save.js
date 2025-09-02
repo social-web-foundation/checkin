@@ -78,7 +78,7 @@ export class CheckinSaveElement extends LitElement {
       const params = oauth.validateAuthResponse(
         authorizationServer,
         client,
-        window.location,
+        new URLSearchParams(window.location.search),
         state
       )
 
