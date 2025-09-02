@@ -44,7 +44,7 @@ export class CheckinSaveElement extends LitElement {
     sessionStorage.removeItem('code_verifier')
   }
 
-  saveResult () {
+  saveResult (result) {
     sessionStorage.setItem('access_token', result.access_token)
     sessionStorage.setItem('refresh_token', result.refresh_token)
     sessionStorage.setItem('expires_in', result.expires_in)
