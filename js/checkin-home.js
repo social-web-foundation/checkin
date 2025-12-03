@@ -97,9 +97,9 @@ export class CheckinHomeElement extends CheckinElement {
 
     <main>
       ${(this._route === 'inbox')
-        ? html`<checkin-inbox .redirect-uri=${this.redirectUri} .client-id=${this.clientId} />`
+        ? html`<checkin-inbox redirect-uri=${this.redirectUri} client-id=${this.clientId} />`
         : (this._route === 'checkin')
-          ? html`<checkin-choose-place .redirect-uri=${this.redirectUri} .  client-id=${this.clientId} />`
+          ? html`<checkin-choose-place redirect-uri=${this.redirectUri}   client-id=${this.clientId} />`
           : html`<sl-alert>Unknown route</sl-alert>`
       }
     </main>
