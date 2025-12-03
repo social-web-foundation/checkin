@@ -68,13 +68,13 @@ export class CheckinElement extends LitElement {
       const refreshToken = localStorage.getItem('refresh_token')
       try {
         const response = await oauth.refreshTokenGrantRequest(
-          as,
+          authorizationServer,
           client,
           clientAuth,
           refreshToken
         )
         const result = await oauth.processRefreshTokenResponse(
-          as,
+          authorizationServer,
           client,
           response
         )
