@@ -139,7 +139,7 @@ export class CheckinInboxElement extends CheckinElement {
             ${this._activities && this._activities.length > 0
               ? this._activities.map(
                   (a) =>
-                    html`<checkin-activity .activity=${a}></checkin-activity>`
+                    html`<checkin-activity .redirect-uri=${this.redirectUri} .client-id=${this.clientId} .activity=${a}></checkin-activity>`
                 )
               : html` <div><p>No activities.</p></div> `}
           </div>
