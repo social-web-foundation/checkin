@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "checkin-cache-";
-const CACHE_VERSION = '0.1.0';
+const CACHE_VERSION = '0.1.1';
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -14,7 +14,10 @@ const APP_SHELL = [
   "/js/checkin-save.js",
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css",
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace.js",
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap",
+  'https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js',
+  'https://cdn.jsdelivr.net/npm/oauth4webapi@3/+esm',
+  'https://cdn.jsdelivr.net/npm/dompurify@3.2.3/+esm'
 ];
 
 // Install: pre-cache app shell
