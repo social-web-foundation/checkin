@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "checkin-cache-";
-const CACHE_VERSION = '0.1.3';
+const CACHE_VERSION = '0.1.4';
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 
 const APP_SHELL = [
