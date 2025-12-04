@@ -198,6 +198,8 @@ export class CheckinChoosePlaceElement extends CheckinElement {
     if (!place) return
 
     const actor = await this.getActor()
+    const content = (this._note) ? this._note.trim() : undefined
+
     const activity = {
       actor: {
         id: actor.id,
@@ -210,7 +212,7 @@ export class CheckinChoosePlaceElement extends CheckinElement {
         name: place.name,
         url: place.url
       },
-      content: this._note || undefined
+      content
     }
 
     const followers = await this.toId(actor.followers)
